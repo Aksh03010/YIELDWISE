@@ -1,0 +1,1256 @@
+@import "tailwindcss";
+
+/* ============================================================
+   YIELD — Master Stylesheet
+   All component classes defined here using Tailwind v4 @apply.
+   JSX files use only semantic class names.
+   ============================================================ */
+
+/* --- Theme & Custom Properties --- */
+@theme {
+  --color-forest: #1B4332;
+  --color-forest-light: #2D6A4F;
+  --color-sage: #95A88C;
+  --color-sage-light: #B7C4B1;
+  --color-sage-muted: #D8E2D4;
+  --color-earth: #8B7355;
+  --color-earth-light: #C4A77D;
+  --color-cream: #FAFAF5;
+  --color-cream-warm: #F5F0E8;
+  --color-offwhite: #F8F9F6;
+  --color-text-primary: #1A2E1A;
+  --color-text-secondary: #4A5D4A;
+  --color-text-muted: #7A8B7A;
+  --color-border: #E2E8DE;
+  --color-border-light: #EEF1EC;
+  --color-success: #2D6A4F;
+  --color-warning: #D4A017;
+  --color-error: #C53030;
+  --color-info: #2B6CB0;
+
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* --- Base Resets --- */
+* {
+  @apply box-border;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply m-0 p-0 bg-cream text-text-primary;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  @apply min-h-screen flex flex-col w-full max-w-full m-0;
+  text-align: left;
+  border: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  @apply text-text-primary;
+}
+
+/* --- Focus States (Accessibility) --- */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-forest;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+  @apply fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border;
+}
+
+.navbar-inner {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16;
+}
+
+.navbar-logo {
+  @apply flex items-center gap-2 no-underline;
+}
+
+.navbar-logo-icon {
+  @apply w-8 h-8 text-forest;
+}
+
+.navbar-logo-text {
+  @apply flex flex-col justify-center;
+}
+
+.navbar-logo-title {
+  @apply text-xl font-bold tracking-wide text-forest leading-none;
+  font-family: var(--font-heading);
+}
+
+.navbar-logo-subtitle {
+  @apply hidden sm:block text-[10px] text-text-muted tracking-widest uppercase mt-0.5;
+  font-family: var(--font-body);
+}
+
+.navbar-links {
+  @apply hidden md:flex items-center gap-1;
+}
+
+.navbar-link {
+  @apply px-3 py-2 text-sm font-medium text-text-secondary rounded-lg no-underline transition-colors duration-200;
+}
+
+.navbar-link:hover {
+  @apply bg-sage-muted/50 text-forest;
+}
+
+.navbar-link.active,
+.navbar-link.navbar-link-active,
+.navbar-link-active {
+  @apply bg-sage-muted text-forest font-semibold;
+}
+
+.navbar-cta {
+  @apply px-5 py-2 bg-forest text-white text-sm font-semibold rounded-full no-underline transition-all duration-200 hover:bg-forest-light hover:shadow-md;
+}
+
+.navbar-mobile-btn {
+  @apply md:hidden p-2 rounded-lg text-text-secondary hover:bg-sage-muted/50;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.navbar-mobile-menu {
+  @apply md:hidden border-t border-border bg-white px-4 py-3 flex flex-col gap-1;
+}
+
+.navbar-mobile-link {
+  @apply px-3 py-2 text-sm font-medium text-text-secondary rounded-lg no-underline transition-colors duration-200;
+}
+
+.navbar-mobile-link:hover,
+.navbar-mobile-link.active,
+.navbar-mobile-link.navbar-link-active {
+  @apply bg-sage-muted text-forest font-semibold;
+}
+
+.navbar-mobile-cta {
+  @apply mt-2 text-center px-4 py-2 bg-forest text-white text-sm font-semibold rounded-full no-underline transition-all duration-200;
+}
+
+.app-layout {
+  @apply min-h-screen flex flex-col;
+}
+
+.main-content {
+  @apply flex-1 flex flex-col;
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero-section {
+  @apply relative mt-16 overflow-hidden;
+  background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 40%, #3A7D5E 70%, #4C956C 100%);
+  min-height: 85vh;
+}
+
+.hero-bg-pattern {
+  @apply absolute inset-0 opacity-10;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 40%),
+    radial-gradient(circle at 60% 80%, rgba(255,255,255,0.08) 0%, transparent 45%);
+}
+
+.hero-topo-lines {
+  @apply absolute inset-0 opacity-[0.04];
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cpath d='M0 200 Q100 150 200 200 T400 200' fill='none' stroke='white' stroke-width='1'/%3E%3Cpath d='M0 250 Q100 200 200 250 T400 250' fill='none' stroke='white' stroke-width='1'/%3E%3Cpath d='M0 150 Q100 100 200 150 T400 150' fill='none' stroke='white' stroke-width='1'/%3E%3Cpath d='M0 300 Q100 250 200 300 T400 300' fill='none' stroke='white' stroke-width='1'/%3E%3Cpath d='M0 100 Q100 50 200 100 T400 100' fill='none' stroke='white' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 400px 400px;
+}
+
+.hero-content {
+  @apply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12;
+}
+
+.hero-text {
+  @apply flex-1 text-center lg:text-left;
+}
+
+.hero-badge {
+  @apply inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-xs font-medium tracking-wider uppercase mb-6 border border-white/20;
+}
+
+.hero-title {
+  @apply text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6;
+  font-family: var(--font-heading);
+}
+
+.hero-title-accent {
+  @apply text-sage-light;
+}
+
+.hero-subtitle {
+  @apply text-lg sm:text-xl text-white/80 max-w-xl mb-10 leading-relaxed;
+  font-family: var(--font-body);
+}
+
+.hero-actions {
+  @apply flex flex-col sm:flex-row gap-4 justify-center lg:justify-start;
+}
+
+.hero-btn-primary {
+  @apply px-8 py-3.5 bg-white text-forest font-semibold rounded-full text-base transition-all duration-200 hover:shadow-xl hover:bg-cream no-underline inline-flex items-center gap-2 justify-center;
+}
+
+.hero-btn-secondary {
+  @apply px-8 py-3.5 bg-transparent text-white font-medium rounded-full text-base border-2 border-white/40 transition-all duration-200 hover:bg-white/10 hover:border-white/70 no-underline inline-flex items-center gap-2 justify-center;
+}
+
+.hero-visual {
+  @apply flex-1 hidden lg:flex justify-center items-center;
+}
+
+.hero-visual-card {
+  @apply bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 max-w-sm w-full;
+}
+
+.hero-stat-row {
+  @apply flex items-center justify-between py-3 border-b border-white/10 last:border-0;
+}
+
+.hero-stat-label {
+  @apply text-white/70 text-sm flex items-center gap-2;
+  font-family: var(--font-body);
+}
+
+.hero-stat-value {
+  @apply text-white font-bold text-lg;
+  font-family: var(--font-body);
+}
+
+.hero-stat-unit {
+  @apply text-white/60 text-sm font-normal ml-1;
+}
+
+/* ============================================================
+   BENEFITS SECTION
+   ============================================================ */
+.benefits-section {
+  @apply py-20 bg-white;
+}
+
+.benefits-inner {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.benefits-header {
+  @apply text-center mb-14;
+}
+
+.benefits-overline {
+  @apply text-sm font-semibold text-forest tracking-wider uppercase mb-3;
+  font-family: var(--font-body);
+}
+
+.benefits-title {
+  @apply text-3xl sm:text-4xl font-bold text-text-primary mb-4;
+}
+
+.benefits-subtitle {
+  @apply text-lg text-text-muted max-w-2xl mx-auto;
+  font-family: var(--font-body);
+}
+
+.benefits-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+}
+
+.benefit-card {
+  @apply bg-offwhite rounded-2xl p-8 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border border-border-light;
+}
+
+.benefit-icon-wrap {
+  @apply w-14 h-14 rounded-xl bg-sage-muted flex items-center justify-center mx-auto mb-5;
+}
+
+.benefit-icon {
+  @apply w-7 h-7 text-forest;
+}
+
+.benefit-title {
+  @apply text-xl font-bold mb-3 text-text-primary;
+}
+
+.benefit-desc {
+  @apply text-text-muted leading-relaxed;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+.how-section {
+  @apply py-20 bg-cream;
+}
+
+.how-inner {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.how-header {
+  @apply text-center mb-14;
+}
+
+.how-steps {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto;
+}
+
+.how-step {
+  @apply relative text-center;
+}
+
+.how-step-number {
+  @apply w-12 h-12 rounded-full bg-forest text-white font-bold text-lg flex items-center justify-center mx-auto mb-5;
+  font-family: var(--font-body);
+}
+
+.how-step-title {
+  @apply text-lg font-bold mb-2 text-text-primary;
+}
+
+.how-step-desc {
+  @apply text-text-muted;
+  font-family: var(--font-body);
+}
+
+.how-connector {
+  @apply hidden md:block absolute top-6 left-[60%] w-[80%] h-0.5 bg-border;
+}
+
+/* ============================================================
+   DISCLAIMER
+   ============================================================ */
+.disclaimer-banner {
+  @apply max-w-4xl mx-auto mt-16 px-6 py-4 bg-cream-warm rounded-xl border border-border flex items-start gap-3;
+}
+
+.disclaimer-icon {
+  @apply w-5 h-5 text-earth mt-0.5 flex-shrink-0;
+}
+
+.disclaimer-text {
+  @apply text-sm text-text-muted leading-relaxed;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   SECTION UTILITIES
+   ============================================================ */
+.section-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.page-section {
+  @apply py-16;
+}
+
+.section-header {
+  @apply text-center mb-12;
+}
+
+.section-overline {
+  @apply text-sm font-semibold text-forest tracking-wider uppercase mb-2;
+  font-family: var(--font-body);
+}
+
+.section-title {
+  @apply text-3xl sm:text-4xl font-bold text-text-primary mb-3;
+}
+
+.section-subtitle {
+  @apply text-lg text-text-muted max-w-2xl mx-auto;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   PREDICTION FORM
+   ============================================================ */
+.form-page {
+  @apply mt-16 min-h-screen bg-cream;
+}
+
+.form-page-header {
+  @apply bg-forest py-12 text-center;
+}
+
+.form-page-title {
+  @apply text-3xl sm:text-4xl font-bold text-white mb-2;
+}
+
+.form-page-subtitle {
+  @apply text-white/70 text-lg;
+  font-family: var(--font-body);
+}
+
+.form-container {
+  @apply max-w-3xl mx-auto px-4 sm:px-6 py-10;
+}
+
+/* Progress bar */
+.form-progress {
+  @apply flex items-center justify-between mb-10;
+}
+
+.form-progress-step {
+  @apply flex items-center gap-2;
+}
+
+.form-progress-circle {
+  @apply w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors duration-200;
+  font-family: var(--font-body);
+}
+
+.form-progress-circle.active {
+  @apply bg-forest border-forest text-white;
+}
+
+.form-progress-circle.completed {
+  @apply bg-forest border-forest text-white;
+}
+
+.form-progress-circle.inactive {
+  @apply bg-white border-border text-text-muted;
+}
+
+.form-progress-label {
+  @apply hidden sm:block text-sm font-medium text-text-secondary;
+  font-family: var(--font-body);
+}
+
+.form-progress-label.inactive {
+  @apply text-text-muted;
+}
+
+.form-progress-line {
+  @apply flex-1 h-0.5 mx-2;
+}
+
+.form-progress-line.active {
+  @apply bg-forest;
+}
+
+.form-progress-line.inactive {
+  @apply bg-border;
+}
+
+/* Form sections */
+.form-section {
+  @apply bg-white rounded-2xl p-6 sm:p-8 mb-6 border border-border-light shadow-sm;
+}
+
+.form-section-header {
+  @apply flex items-center gap-3 mb-6 pb-4 border-b border-border-light;
+}
+
+.form-section-icon {
+  @apply w-5 h-5 text-forest;
+}
+
+.form-section-title {
+  @apply text-lg font-bold text-text-primary;
+  font-family: var(--font-heading);
+}
+
+.form-section-subtitle {
+  @apply text-sm text-text-muted;
+  font-family: var(--font-body);
+}
+
+/* Form fields */
+.form-group {
+  @apply mb-5;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-text-primary mb-1.5;
+  font-family: var(--font-body);
+}
+
+.form-label-required {
+  @apply text-error ml-0.5;
+}
+
+.form-helper {
+  @apply text-xs text-text-muted mt-1;
+  font-family: var(--font-body);
+}
+
+.form-input {
+  @apply w-full px-4 py-2.5 bg-offwhite border border-border rounded-lg text-text-primary text-sm transition-colors duration-200;
+  font-family: var(--font-body);
+}
+
+.form-input:focus {
+  @apply outline-none border-forest ring-2 ring-forest/20;
+}
+
+.form-input.error {
+  @apply border-error ring-2 ring-error/20;
+}
+
+.form-select {
+  @apply w-full px-4 py-2.5 bg-offwhite border border-border rounded-lg text-text-primary text-sm appearance-none transition-colors duration-200 cursor-pointer;
+  font-family: var(--font-body);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A8B7A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.form-select:focus {
+  @apply outline-none border-forest ring-2 ring-forest/20;
+}
+
+.form-error-msg {
+  @apply text-xs text-error mt-1 flex items-center gap-1;
+  font-family: var(--font-body);
+}
+
+.form-row {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+}
+
+/* Form buttons */
+.form-actions {
+  @apply flex flex-col sm:flex-row gap-3 mt-8;
+}
+
+.form-btn-primary {
+  @apply flex-1 px-6 py-3 bg-forest text-white font-semibold rounded-xl text-base transition-all duration-200 hover:bg-forest-light hover:shadow-md inline-flex items-center justify-center gap-2 border-none cursor-pointer;
+  font-family: var(--font-body);
+}
+
+.form-btn-primary:disabled {
+  @apply opacity-50 cursor-not-allowed hover:shadow-none;
+}
+
+.form-btn-secondary {
+  @apply px-6 py-3 bg-white text-text-secondary font-medium rounded-xl text-base border border-border transition-all duration-200 hover:bg-offwhite inline-flex items-center justify-center gap-2 cursor-pointer;
+  font-family: var(--font-body);
+}
+
+.form-btn-demo {
+  @apply px-6 py-3 bg-cream-warm text-earth font-medium rounded-xl text-base border border-earth-light/30 transition-all duration-200 hover:bg-earth-light/20 inline-flex items-center justify-center gap-2 cursor-pointer;
+  font-family: var(--font-body);
+}
+
+/* Map placeholder */
+.map-placeholder {
+  @apply w-full h-48 bg-sage-muted/30 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center text-text-muted gap-2 mt-3;
+}
+
+.map-placeholder-icon {
+  @apply w-8 h-8 text-sage;
+}
+
+.map-placeholder-text {
+  @apply text-sm;
+  font-family: var(--font-body);
+}
+
+/* Coordinate inputs */
+.coord-inputs {
+  @apply grid grid-cols-2 gap-3 mt-3;
+}
+
+/* ============================================================
+   LOADING STATE
+   ============================================================ */
+.loading-page {
+  @apply mt-16 min-h-screen bg-cream flex items-center justify-center;
+}
+
+.loading-container {
+  @apply text-center max-w-md px-6;
+}
+
+.loading-spinner {
+  @apply w-16 h-16 mx-auto mb-6 text-forest;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-title {
+  @apply text-2xl font-bold text-text-primary mb-3;
+}
+
+.loading-subtitle {
+  @apply text-text-muted mb-8;
+  font-family: var(--font-body);
+}
+
+.loading-steps {
+  @apply text-left space-y-3;
+}
+
+.loading-step {
+  @apply flex items-center gap-3 text-sm;
+  font-family: var(--font-body);
+}
+
+.loading-step-icon {
+  @apply w-5 h-5;
+}
+
+.loading-step-icon.done {
+  @apply text-success;
+}
+
+.loading-step-icon.active {
+  @apply text-forest;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.loading-step-icon.pending {
+  @apply text-text-muted;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ============================================================
+   RESULTS DASHBOARD
+   ============================================================ */
+.results-page {
+  @apply mt-16 min-h-screen bg-cream;
+}
+
+.results-header {
+  @apply bg-forest py-10;
+}
+
+.results-header-inner {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.results-header-top {
+  @apply flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6;
+}
+
+.results-header-title {
+  @apply text-2xl sm:text-3xl font-bold text-white;
+}
+
+.results-header-actions {
+  @apply flex gap-3;
+}
+
+.results-header-btn {
+  @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 no-underline inline-flex items-center gap-2 cursor-pointer;
+  font-family: var(--font-body);
+}
+
+.results-header-btn-outline {
+  @apply bg-transparent text-white/80 border border-white/30 hover:bg-white/10;
+}
+
+.results-header-btn-solid {
+  @apply bg-white text-forest border-none hover:bg-cream;
+}
+
+.results-demo-banner {
+  @apply flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg border border-white/20;
+}
+
+.results-demo-text {
+  @apply text-sm text-white/80;
+  font-family: var(--font-body);
+}
+
+.results-body {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+/* Yield result card */
+.yield-card {
+  @apply bg-white rounded-2xl border border-border-light shadow-sm overflow-hidden mb-8;
+}
+
+.yield-card-header {
+  @apply bg-sage-muted/30 px-6 sm:px-8 py-5 border-b border-border-light flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3;
+}
+
+.yield-card-crop {
+  @apply text-lg font-bold text-text-primary;
+}
+
+.yield-card-location {
+  @apply text-sm text-text-muted;
+  font-family: var(--font-body);
+}
+
+.yield-card-season-badge {
+  @apply px-3 py-1 bg-forest/10 text-forest text-xs font-medium rounded-full;
+  font-family: var(--font-body);
+}
+
+.yield-card-body {
+  @apply px-6 sm:px-8 py-8;
+}
+
+.yield-card-metrics {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6;
+}
+
+.yield-metric {
+  @apply text-center sm:text-left;
+}
+
+.yield-metric-label {
+  @apply text-xs font-medium text-text-muted uppercase tracking-wider mb-1;
+  font-family: var(--font-body);
+}
+
+.yield-metric-value {
+  @apply text-3xl sm:text-4xl font-bold text-forest;
+  font-family: var(--font-body);
+}
+
+.yield-metric-unit {
+  @apply text-base font-normal text-text-muted ml-1;
+}
+
+.yield-metric-range {
+  @apply text-xs text-text-muted mt-1;
+  font-family: var(--font-body);
+}
+
+.yield-card-footer {
+  @apply px-6 sm:px-8 py-4 bg-cream-warm/50 border-t border-border-light;
+}
+
+.yield-card-note {
+  @apply text-xs text-text-muted leading-relaxed;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   ENVIRONMENTAL CARDS
+   ============================================================ */
+.env-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8;
+}
+
+.env-card {
+  @apply bg-white rounded-xl p-5 border border-border-light shadow-sm transition-all duration-200 hover:shadow-md;
+}
+
+.env-card-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.env-card-title-group {
+  @apply flex items-center gap-2;
+}
+
+.env-card-icon {
+  @apply w-5 h-5 text-forest;
+}
+
+.env-card-title {
+  @apply text-sm font-semibold text-text-primary;
+  font-family: var(--font-body);
+}
+
+.env-card-badge {
+  @apply px-2 py-0.5 text-[10px] font-medium rounded-full;
+  font-family: var(--font-body);
+}
+
+.env-card-badge.demo {
+  @apply bg-earth-light/20 text-earth;
+}
+
+.env-card-badge.live {
+  @apply bg-success/10 text-success;
+}
+
+.env-card-badge.unavailable {
+  @apply bg-border text-text-muted;
+}
+
+.env-card-value {
+  @apply text-2xl font-bold text-text-primary mb-1;
+  font-family: var(--font-body);
+}
+
+.env-card-unit {
+  @apply text-sm font-normal text-text-muted;
+}
+
+.env-card-detail {
+  @apply text-xs text-text-muted mt-2;
+  font-family: var(--font-body);
+}
+
+.env-card-sub-row {
+  @apply flex justify-between text-xs text-text-muted mt-2 pt-2 border-t border-border-light;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   CHARTS
+   ============================================================ */
+.chart-panel {
+  @apply bg-white rounded-2xl p-6 border border-border-light shadow-sm mb-8;
+}
+
+.chart-panel-header {
+  @apply flex items-center justify-between mb-6;
+}
+
+.chart-panel-title {
+  @apply text-lg font-bold text-text-primary;
+  font-family: var(--font-heading);
+}
+
+.chart-panel-badge {
+  @apply px-3 py-1 bg-earth-light/20 text-earth text-xs font-medium rounded-full;
+  font-family: var(--font-body);
+}
+
+.chart-container {
+  @apply w-full;
+}
+
+.chart-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8;
+}
+
+/* ============================================================
+   MODEL INSIGHTS
+   ============================================================ */
+.insights-section {
+  @apply bg-white rounded-2xl p-6 sm:p-8 border border-border-light shadow-sm mb-8;
+}
+
+.insights-header {
+  @apply mb-8;
+}
+
+.insights-title {
+  @apply text-xl font-bold text-text-primary mb-1;
+}
+
+.insights-subtitle {
+  @apply text-sm text-text-muted;
+  font-family: var(--font-body);
+}
+
+.insights-badge {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 bg-earth-light/20 text-earth text-xs font-medium rounded-full mt-3;
+  font-family: var(--font-body);
+}
+
+.factor-list {
+  @apply space-y-4;
+}
+
+.factor-item {
+  @apply flex items-start gap-4;
+}
+
+.factor-icon-wrap {
+  @apply w-10 h-10 rounded-lg bg-sage-muted/50 flex items-center justify-center flex-shrink-0;
+}
+
+.factor-icon {
+  @apply w-5 h-5 text-forest;
+}
+
+.factor-content {
+  @apply flex-1 min-w-0;
+}
+
+.factor-name-row {
+  @apply flex items-center justify-between mb-1;
+}
+
+.factor-name {
+  @apply text-sm font-semibold text-text-primary;
+  font-family: var(--font-body);
+}
+
+.factor-impact {
+  @apply px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase;
+  font-family: var(--font-body);
+}
+
+.factor-impact.high {
+  @apply bg-forest/10 text-forest;
+}
+
+.factor-impact.medium {
+  @apply bg-earth-light/20 text-earth;
+}
+
+.factor-impact.low {
+  @apply bg-border text-text-muted;
+}
+
+.factor-desc {
+  @apply text-xs text-text-muted mb-2;
+  font-family: var(--font-body);
+}
+
+.factor-bar-bg {
+  @apply w-full h-2 bg-border-light rounded-full overflow-hidden;
+}
+
+.factor-bar-fill {
+  @apply h-full rounded-full transition-all duration-700;
+  background: linear-gradient(90deg, var(--color-sage) 0%, var(--color-forest) 100%);
+}
+
+/* Pipeline steps */
+.pipeline-section {
+  @apply mt-10 pt-8 border-t border-border-light;
+}
+
+.pipeline-title {
+  @apply text-lg font-bold text-text-primary mb-6;
+  font-family: var(--font-heading);
+}
+
+.pipeline-steps {
+  @apply space-y-4;
+}
+
+.pipeline-step {
+  @apply flex items-start gap-4;
+}
+
+.pipeline-step-number {
+  @apply w-8 h-8 rounded-full bg-sage-muted flex items-center justify-center text-xs font-bold text-forest flex-shrink-0;
+  font-family: var(--font-body);
+}
+
+.pipeline-step-text {
+  @apply text-sm text-text-secondary pt-1.5;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   HISTORICAL COMPARISON
+   ============================================================ */
+.historical-section {
+  @apply bg-white rounded-2xl p-6 sm:p-8 border border-border-light shadow-sm mb-8;
+}
+
+/* ============================================================
+   FINANCIAL PREVIEW
+   ============================================================ */
+.financial-section {
+  @apply bg-white rounded-2xl p-6 sm:p-8 border border-border-light shadow-sm mb-8;
+}
+
+.financial-header {
+  @apply flex items-center justify-between mb-6;
+}
+
+.financial-title {
+  @apply text-xl font-bold text-text-primary;
+}
+
+.financial-badge {
+  @apply px-3 py-1 bg-earth-light/20 text-earth text-xs font-semibold rounded-full;
+  font-family: var(--font-body);
+}
+
+.financial-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+}
+
+.financial-card {
+  @apply p-4 bg-cream rounded-xl border border-border-light text-center relative overflow-hidden;
+}
+
+.financial-card-overlay {
+  @apply absolute inset-0 bg-cream/60 backdrop-blur-[1px] flex items-center justify-center z-10;
+}
+
+.financial-card-coming {
+  @apply px-3 py-1 bg-earth-light/30 text-earth text-xs font-semibold rounded-full;
+  font-family: var(--font-body);
+}
+
+.financial-card-label {
+  @apply text-xs font-medium text-text-muted uppercase tracking-wider mb-2;
+  font-family: var(--font-body);
+}
+
+.financial-card-value {
+  @apply text-xl font-bold text-text-muted;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   MAP PANEL
+   ============================================================ */
+.map-panel {
+  @apply bg-white rounded-2xl overflow-hidden border border-border-light shadow-sm mb-8;
+}
+
+.map-panel-header {
+  @apply px-6 py-4 border-b border-border-light flex items-center justify-between;
+}
+
+.map-panel-title {
+  @apply text-lg font-bold text-text-primary;
+  font-family: var(--font-heading);
+}
+
+.map-panel-body {
+  @apply relative;
+}
+
+.map-panel-placeholder {
+  @apply w-full h-64 sm:h-80 bg-sage-muted/20 flex flex-col items-center justify-center text-text-muted gap-3;
+  background-image:
+    linear-gradient(rgba(149, 168, 140, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(149, 168, 140, 0.08) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.map-panel-placeholder-icon {
+  @apply w-10 h-10 text-sage;
+}
+
+.map-panel-placeholder-text {
+  @apply text-sm font-medium;
+  font-family: var(--font-body);
+}
+
+.map-panel-coords {
+  @apply text-xs text-text-muted;
+  font-family: var(--font-body);
+}
+
+.map-panel-footer {
+  @apply px-6 py-3 bg-cream/50 border-t border-border-light text-xs text-text-muted;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   ABOUT PAGE
+   ============================================================ */
+.about-page {
+  @apply mt-16 min-h-screen bg-cream;
+}
+
+.about-hero {
+  @apply bg-forest py-16 text-center flex flex-col items-center justify-center text-white px-4;
+}
+
+.about-hero > svg {
+  @apply text-sage-light mb-2;
+}
+
+.about-hero-title {
+  @apply text-3xl sm:text-4xl font-bold text-white mb-4;
+}
+
+.about-hero-subtitle {
+  @apply text-lg text-white/70 max-w-2xl mx-auto px-4;
+  font-family: var(--font-body);
+}
+
+.about-body {
+  @apply max-w-4xl mx-auto px-4 sm:px-6 py-12;
+}
+
+.about-section {
+  @apply mb-12;
+}
+
+.about-section-title {
+  @apply text-2xl font-bold text-text-primary mb-4;
+}
+
+.about-text {
+  @apply text-text-secondary leading-relaxed mb-4;
+  font-family: var(--font-body);
+}
+
+.about-tech-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6;
+}
+
+.about-tech-card {
+  @apply bg-white rounded-xl p-5 border border-border-light;
+}
+
+.about-tech-card > svg {
+  @apply text-forest mb-3;
+}
+
+.about-tech-card-title {
+  @apply text-sm font-semibold text-text-primary mb-2;
+  font-family: var(--font-body);
+}
+
+.about-tech-card-desc {
+  @apply text-xs text-text-muted;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   DATA SOURCE BADGE
+   ============================================================ */
+.data-source-badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium;
+  font-family: var(--font-body);
+}
+
+.data-source-badge.demonstration {
+  @apply bg-earth-light/20 text-earth;
+}
+
+.data-source-badge.user-provided {
+  @apply bg-info/10 text-info;
+}
+
+.data-source-badge.retrieved {
+  @apply bg-success/10 text-success;
+}
+
+.data-source-badge.unavailable {
+  @apply bg-border text-text-muted;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  @apply bg-forest mt-auto;
+}
+
+.footer-inner {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+}
+
+.footer-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8;
+}
+
+.footer-brand {
+  @apply col-span-1 sm:col-span-2 lg:col-span-1;
+}
+
+.footer-brand-logo {
+  @apply flex items-center gap-2 mb-3;
+}
+
+.footer-brand-icon {
+  @apply w-7 h-7 text-sage-light;
+}
+
+.footer-brand-name {
+  @apply text-xl font-bold text-white;
+  font-family: var(--font-heading);
+}
+
+.footer-brand-desc {
+  @apply text-sm text-white/60 leading-relaxed;
+  font-family: var(--font-body);
+}
+
+.footer-links-column {
+  @apply flex flex-col;
+}
+
+.footer-col-title,
+.footer-links-title {
+  @apply text-sm font-semibold text-white mb-3;
+  font-family: var(--font-body);
+}
+
+.footer-links {
+  @apply list-none p-0 m-0 space-y-2;
+}
+
+.footer-link {
+  @apply text-sm text-white/60 no-underline transition-colors duration-200 hover:text-white;
+  font-family: var(--font-body);
+}
+
+.footer-bottom {
+  @apply pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4;
+}
+
+.footer-copyright {
+  @apply text-xs text-white/40;
+  font-family: var(--font-body);
+}
+
+.footer-disclaimer {
+  @apply text-xs text-white/40 max-w-lg text-center sm:text-right;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   ERROR STATE
+   ============================================================ */
+.error-state {
+  @apply text-center py-16 px-6;
+}
+
+.error-state-icon {
+  @apply w-16 h-16 mx-auto mb-4 text-error/50;
+}
+
+.error-state-title {
+  @apply text-xl font-bold text-text-primary mb-2;
+}
+
+.error-state-msg {
+  @apply text-text-muted mb-6;
+  font-family: var(--font-body);
+}
+
+.error-state-btn {
+  @apply px-6 py-2.5 bg-forest text-white font-medium rounded-lg transition-colors duration-200 hover:bg-forest-light cursor-pointer border-none;
+  font-family: var(--font-body);
+}
+
+/* ============================================================
+   RESPONSIVE UTILITIES
+   ============================================================ */
+@media (max-width: 640px) {
+  .hero-title {
+    @apply text-3xl;
+  }
+  
+  .yield-metric-value {
+    @apply text-2xl;
+  }
+  
+  .form-section {
+    @apply p-4;
+  }
+}
