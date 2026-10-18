@@ -3,12 +3,15 @@ import { formatNumber as fmt } from '../data/agriculture.js'
 import examples from '../data/modelExamples.json'
 import { TARGET_LABELS, TARGET_UNITS } from '../data/modelTargets.js'
 import { predictTargets } from '../services/predictionService.js'
+import HarvestTiming from './HarvestTiming.jsx'
+import { dayOfYear, dateFromDayOfYear } from '../services/harvestTiming.js'
 
 export default function PredictionRunner({ entry }) {
   const seed = examples[entry.crop]
   const seedText = JSON.stringify(seed?.inputs || {}, null, 2)
   const [inputText, setInputText] = useState(seedText)
   const [siteId, setSiteId] = useState(seed?.siteId || '')
+  const [calendarDate, setCalendarDate] = useState(seed?.plantingDate || '')
   const [inputError, setInputError] = useState('')
   const [request, setRequest] = useState(() => ({ id: 0, inputs: seed?.inputs || {}, inputText: seedText, siteId: seed?.siteId || '', example: true }))
   const [state, setState] = useState(null)
@@ -28,6 +31,16 @@ export default function PredictionRunner({ entry }) {
   const results = dirty ? [] : current.results
   const yieldId = crop === 'corn' ? 'Yield_Mg_ha' : 'yield_t_ha'
   const yieldResult = results.find(result => result.target === yieldId)
+  const timingId = crop === 'corn' ? 'Harvest_DAP_days' : 'R8_maturity_DAP'
+  const timingTarget = entry.targets.find(target => target.id === timingId)
+  const timingResult = results.find(result => result.target === timingId)
+  let draftInputs
+  try { draftInputs = JSON.parse(inputText) || {} } catch { draftInputs = {} }
+  const plantingDate = crop === 'soybeans' ? dateFromDayOfYear(Number(calendarDate.slice(0, 4)), draftInputs.planting_doy) : calendarDate
+  function changePlantingDate(value) {
+    setCalendarDate(value)
+    if (crop === 'soybeans' && dayOfYear(value) !== null) setInputText(JSON.stringify({ ...draftInputs, planting_doy: dayOfYear(value) }, null, 2))
+  }
   function run(event) {
     event.preventDefault()
     let inputs
@@ -38,6 +51,7 @@ export default function PredictionRunner({ entry }) {
   }
   function reset() {
     setInputText(seedText); setSiteId(seed?.siteId || ''); setInputError('')
+    setCalendarDate(seed?.plantingDate || '')
     setRequest(previous => ({ id: previous.id + 1, inputs: seed?.inputs || {}, inputText: seedText, siteId: seed?.siteId || '', example: true }))
   }
   return <>
@@ -65,7 +79,8 @@ export default function PredictionRunner({ entry }) {
       <div className="stat-value">{fmt(yieldResult?.value, 2)}<small>t/ha</small></div>
       <p className="stat-note" role="status">{dirty ? 'Inputs changed. Run prediction to update results.' : current.status === 'loading' ? 'Calculating with the trained model…' : current.status === 'error' ? 'The prediction request timed out. Press Run prediction to retry.' : yieldResult?.error || `${request.example ? 'Example inputs' : 'Your model inputs'} · computed by the ${crop === 'corn' ? 'maize' : 'soybean'} model`}</p>
     </section>
-    <div className="two-col">{entry.targets.filter(target => target.id !== yieldId).map(target => {
+    {timingTarget && <HarvestTiming crop={crop} result={timingResult} target={timingTarget} plantingDate={plantingDate} onDateChange={changePlantingDate} dirty={dirty} loading={!dirty && current.status === 'loading'} />}
+    <div className="two-col">{entry.targets.filter(target => target.id !== yieldId && target.id !== timingId).map(target => {
       const result = results.find(value => value.target === target.id)
       return <section className="card" key={target.id}><h3>{TARGET_LABELS[target.id] || target.id}</h3><div className="stat-value">{fmt(result?.value, target.id.includes('DAP') ? 0 : 1)}<small>{TARGET_UNITS[target.id] || target.unit}</small></div>{result?.error && <p className="msg" role="alert">{result.error}</p>}{target.id === 'Harvest_DAP_days' && <p className="stat-note">Estimated timing of a recorded harvest operation, not an optimized harvest window.</p>}</section>
     })}</div>

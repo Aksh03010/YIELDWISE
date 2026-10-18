@@ -6,7 +6,7 @@ import TypingHeading from '../components/TypingHeading.jsx'
 
 // Field conditions: everything the live weather provider returns for this
 // coordinate, plus an honest list of what has no data yet.
-export default function ConditionsPage({ farm, weather, status, refreshWeather }) {
+export default function ConditionsPage({ farm, weather, status, checkedAt, refreshWeather }) {
   const values = weather || {}
   const days = (values.days || []).slice(0, 7)
   const checks = days.flatMap(day => [
@@ -36,6 +36,8 @@ export default function ConditionsPage({ farm, weather, status, refreshWeather }
 
     <div className="source-note" role="status">
       <span>
+        Updates every minute while this page is visible. {checkedAt && <>Last checked {new Date(checkedAt).toLocaleTimeString()}. </>}
+        {status === 'error' && weather && <>The latest update failed; the last successful data remains displayed. </>}
         {weather
           ? <>Weather model values from <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a>. Retrieved {new Date(weather.fetchedAt).toLocaleString()}. Model time: {weather.modelTime.replace('T', ' ')} (field local time). {weather.cached ? 'Served from the weather cache.' : ''}</>
           : status === 'loading'

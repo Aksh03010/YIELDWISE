@@ -59,7 +59,7 @@ The verified JSON exports and run provenance are committed in
 `backend/artifacts/`. Raw prepared datasets and training checkpoints are not.
 `POST /api/weather` accepts validated North American coordinates and retrieves
 modeled Open-Meteo weather through the backend. Results carry model/retrieval
-timestamps and cache status; the cache expires after ten minutes. Provider
+timestamps and cache status; the cache expires after one minute. Provider
 failures return 503 and missing measurements remain null. The service does
 not pass weather values into a trial model without its required input contract.
 
@@ -74,12 +74,50 @@ Saved test replays can include a planting date outside fitted serving bounds.
 Their numeric parity is verified internally; the public endpoint still rejects
 that input. No endpoint substitutes a demo yield, sample weather or price.
 
-The frontend does not infer yield automatically from a field profile. Installed
-models are selectable even if the saved field uses an unsupported crop. The
-example inputs run through the real backend automatically; no example prediction
-values are stored in frontend code. Maize uses a recorded COH1 trial input;
+The field workflow automatically runs the maize model when coordinates, actual
+planting date and area are complete, after an 800 ms pause in editing. It checks
+again every minute while visible and when the tab returns to the foreground.
+Polling can be paused; refresh failures retain the previous result only for
+exactly matching field inputs. Current weather loads from coordinates even before
+a planting date is entered. Source retrieval times are distinct from check times:
+rechecking historical planting weather can leave the estimate unchanged.
+
+Installed models are selectable even if the saved field uses an unsupported crop.
+In the separate Trial examples mode, example inputs run through the real backend
+automatically; no example prediction values are stored in frontend code.
+Maize uses a recorded COH1 trial input;
 the soybean example uses a known strain/site and planting day 145 inside fitted
 bounds. Example inputs are separate from the saved field. Editable research
 inputs and model-performance details remain available. There is no calibrated grade probability, economically
 optimal harvest date or causal rainfall/irrigation response model. The
 input-based economics calculator is independent of model predictions.
+
+## Experimental location inference
+
+`POST /api/field-forecast` accepts maize, coordinates, planting date, hectares
+and `research_only: true`. This path retrieves actual NASA POWER AG/LST daily
+data for planting through day 30, requires all 31 days for every required
+variable, validates units, and computes the same mean/min/max/sum feature schema.
+Future or incomplete weather windows return an error. It does not borrow trial
+inputs or fill missing days from training medians. Results show coordinates,
+environment summaries, source/version/hash, conversions and model version.
+
+Current NASA AG PAR totals arrive as MJ/m²/day. The frozen G2F features use
+average W/m², consistent with the
+[G2F publication's variable definitions](https://www.genomes2fields.org/docs/publications/2024.02.08.579534v1.full.pdf).
+The adapter converts by 1,000,000/86,400 before aggregation; other unexpected
+units fail. A live COH1 2021 source comparison exposed this mismatch before
+serving. NASA revisions differ slightly from the frozen research snapshot.
+
+This path allows current seasons as explicitly experimental extrapolation and
+reports inputs outside fitted ranges. It does not change `/api/predict`'s strict
+historical trial guards, reselect models, or claim validation on new farms.
+The site-history moisture baseline is excluded from new-field outputs because
+it cannot infer a new field's moisture from coordinates. Yield, test weight,
+silking and recorded harvest timing use their selected environmental models.
+Area multiplies yield into tonnes; it is not a yield predictor. SoyNAM has no
+coordinate/weather predictors and remains in the separate trial-input workflow.
+
+NASA responses are cached for 24 hours in a bounded 128-entry cache keyed by
+coordinates and planting window. Nearby fields can share coarse environmental
+grid data; a point request is not a soil test or satellite field delineation.

@@ -703,6 +703,19 @@ svg.spinning, .spinning > svg { animation: spin 1.2s linear infinite; }
 .prediction-primary .stat-note { color: #d5e3c1; }
 .prediction-primary .stat-value small { color: #d5e3c1; }
 .prediction-warning { margin-top: 20px; }
+.continuous-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-block: 24px; padding-block: 20px; border-block: 1px solid var(--line); }
+.continuous-controls .source-note { margin-bottom: 0; }
+.prediction-modes { display: flex; gap: 8px; flex-wrap: wrap; }
+.prediction-modes button { border: 1px solid var(--line); background: white; border-radius: 8px; padding: 10px 16px; font-size: 14px; }
+.prediction-modes button[aria-pressed='true'] { background: var(--green-900); border-color: var(--green-900); color: white; }
+.field-data-source p { margin-top: 10px; }
+.field-data-source strong { color: var(--green-900); }
+.harvest-timing { background: #eef3e6; }
+.harvest-planting-date { max-width: 300px; margin: 20px 0; }
+.harvest-date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 20px 0; border-top: 1px solid #d4dfc7; border-bottom: 1px solid #d4dfc7; margin-bottom: 16px; }
+.harvest-date-value { color: var(--green-900); font-size: 30px; font-weight: 600; line-height: 1.3; margin: 8px 0; }
+.harvest-date-range { color: var(--green-900); font-size: 21px; font-weight: 600; line-height: 1.5; margin: 8px 0; }
+@media (max-width: 600px) { .harvest-date-grid { grid-template-columns: 1fr; gap: 20px; } }
 @media (max-width: 600px) { .model-selector { grid-template-columns: 1fr; gap: 16px; } }
 @media (max-width: 460px) { .location-search { flex-direction: column; align-items: stretch; } }
 

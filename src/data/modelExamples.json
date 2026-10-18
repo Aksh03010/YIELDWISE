@@ -72,6 +72,7 @@
       "PRECTOTCORR_sum": 38.11
     },
     "siteId": "COH1",
+    "plantingDate": "2021-05-22",
     "description": "Recorded G2F trial COH1, 2021, with 31 days of early-season weather."
   },
   "soybeans": {
@@ -82,6 +83,7 @@
       "planting_doy": 145
     },
     "siteId": "",
+    "plantingDate": "2013-05-25",
     "description": "Known SoyNAM strain DS11-02002 and site IA, with example planting day 145 inside the fitted domain."
   }
 }

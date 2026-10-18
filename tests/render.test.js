@@ -36,21 +36,33 @@ test('workspace renders supported tools without simulated forecasts or missing-d
     const { default: Conditions } = await server.ssrLoadModule('/src/pages/ConditionsPage.jsx')
     const { FARMS } = await import('../src/data/agriculture.js')
     const { default: Outlook } = await server.ssrLoadModule('/src/pages/OutlookPage.jsx')
+    const { default: PredictionRunner } = await server.ssrLoadModule('/src/components/PredictionRunner.jsx')
     for (const [crop, filename] of [['corn', 'maize'], ['soybeans', 'soybean']]) {
       const artifact = JSON.parse(await readFile(new URL(`../backend/artifacts/${filename}_research_artifact.json`, import.meta.url), 'utf8'))
       const catalog = { crops: [{ crop, status: 'research_only', scope: artifact.manifest.scope || artifact.manifest.geography,
         targets: Object.entries(artifact.targets).map(([id, target]) => ({ id, ...target })) }] }
-      const outlook = renderToStaticMarkup(createElement(Outlook, { farm: { ...FARMS[0], crop }, catalog, modelStatus: 'ready' }))
-      assert.ok(outlook.includes('Run the trained model') && outlook.includes('Predicted grain yield'))
-      assert.ok(outlook.includes('Backend connected') && !outlook.includes('Farm forecast unavailable'))
-      const wheatOutlook = renderToStaticMarkup(createElement(Outlook, { farm: FARMS[0], catalog, modelStatus: 'ready' }))
-      assert.ok(wheatOutlook.includes('Prediction model') && wheatOutlook.includes('Run the trained model'), 'A saved wheat field must not hide installed models')
+      const outlook = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(Outlook, { farm: { ...FARMS[0], crop }, catalog, modelStatus: 'ready' })))
+      assert.ok(outlook.includes('Your field location') && outlook.includes('Trial examples'))
+      assert.ok(!outlook.includes('Recorded G2F trial'), 'Field mode must not silently run trial inputs')
+      if (crop === 'corn') {
+        assert.ok(outlook.includes('Refresh estimate now') && outlook.includes('NASA POWER'))
+        assert.ok(outlook.includes('Automatic updates on') && outlook.includes('Pause automatic updates'))
+        assert.ok(outlook.includes('Current weather at this location'), 'Weather must not wait for a model run or planting date')
+      }
+      const trial = renderToStaticMarkup(createElement(PredictionRunner, { entry: catalog.crops[0] }))
+      assert.ok(trial.includes('Run the trained model') && trial.includes('Predicted grain yield'))
     }
     const weather = { modelTime: '2026-10-18T12:00', fetchedAt: '2026-10-18T16:00:00Z', days: Array.from({ length: 16 }, (_, i) => ({ date: `2026-10-${String(18 + i).padStart(2, '0')}`, min: i === 0 ? -1 : 5, max: 20, rain: 0, code: 1 })) }
     const weatherHtml = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(Conditions, { farm: FARMS[0], weather, status: 'ready' })))
     assert.equal((weatherHtml.match(/class="day"/g) || []).length, 7)
     assert.ok(weatherHtml.includes('is at or below freezing.'))
     const { default: AnimatedMoney } = await server.ssrLoadModule('/src/components/AnimatedMoney.jsx')
+    const { default: HarvestTiming } = await server.ssrLoadModule('/src/components/HarvestTiming.jsx')
+    const timingHtml = renderToStaticMarkup(createElement(HarvestTiming, { crop: 'corn', result: { value: 184.43 }, target: { test_metrics: { MAE_in_target_units: 10.5667 } }, plantingDate: '2021-05-22' }))
+    assert.ok(timingHtml.includes('Estimated harvest date') && timingHtml.includes('Nov 22, 2021'))
+    assert.ok(timingHtml.includes('Nov 11, 2021') && timingHtml.includes('Dec 3, 2021'))
+    const maturityHtml = renderToStaticMarkup(createElement(HarvestTiming, { crop: 'soybeans', result: { value: 130 }, target: { test_metrics: { environment_macro_mae: 8.0197 } }, plantingDate: '2013-05-25' }))
+    assert.ok(maturityHtml.includes('Estimated R8 maturity date') && !maturityHtml.includes('Estimated harvest date'))
     const { default: TypingHeading } = await server.ssrLoadModule('/src/components/TypingHeading.jsx')
     const amount = renderToStaticMarkup(createElement(AnimatedMoney, { value: -1234 }))
     assert.ok(amount.includes('<span class="sr-only">-$1,234</span>'))

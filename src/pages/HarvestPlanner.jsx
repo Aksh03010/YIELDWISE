@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import TypingHeading from '../components/TypingHeading.jsx'
 import AnimatedMoney from '../components/AnimatedMoney.jsx'
 import { formatNumber as fmt } from '../data/agriculture.js'
@@ -25,7 +26,7 @@ export default function HarvestPlanner({ farm }) {
   const percentInvalid = factor !== 'testWeight' && (Number(measured) > 100 || Number(threshold) > 100)
   const passes = percentInvalid ? null : compareMeasurement(measured, threshold, direction)
   return <div className="flow"><div className="page-head"><div><TypingHeading text="Harvest planning" /><p className="sub">Input-based planning for {farm.name}. Prices, quantities and costs are your assumptions.</p></div></div>
-    <section className="card"><h2>Compare operating returns</h2><p>Net operating return = harvest quantity × saleable fraction × sale price − operating expenses. Changing a date does not automatically change yield, grade, weather losses or price. Enter the assumptions for each date yourself.</p><p className="stat-note">Amounts are in USD. This comparison does not predict an optimal harvest window or market prices.</p></section>
+    <section className="card"><h2>Compare operating returns</h2><p>Net operating return = harvest quantity × saleable fraction × sale price − operating expenses. Changing a date does not automatically change yield, grade, weather losses or price. Enter the assumptions for each date yourself.</p><p className="stat-note">Amounts are in USD. This comparison does not predict an optimal harvest window or market prices.</p><Link className="link" to="/outlook">View estimated harvest dates in Yield outlook</Link></section>
     <div className="two-col"><Scenario label="Scenario A" value={a} onChange={setA} /><Scenario label="Scenario B" value={b} onChange={setB} /></div>
     {ar && br && <section className="card card-sun" role="status"><h2>Scenario B minus Scenario A</h2><div className="stat-value"><AnimatedMoney value={br.net - ar.net} /></div><p className="stat-note">Difference in net operating return under the assumptions you entered.</p></section>}
     <section className="card" id="grade-target"><h2>Measured grain check</h2><p>Compare one measured factor against a threshold from your buyer or laboratory. Passing one factor does not establish an official grade or predict future quality.</p><div className="form-grid">

@@ -190,7 +190,7 @@ export default function FieldEditor({ farm, saveFarm }) {
         </section>
 
         <p className="privacy-note">
-          <span>Field details are stored on this device. Coordinates are sent to the HARVEST backend, which retrieves Open-Meteo weather after saving. <Link to="/about">Data details</Link></span>
+          <span>Field details are stored on this device. The backend retrieves Open-Meteo weather after saving. In Yield outlook, complete field inputs automatically send coordinates and planting dates to NASA POWER for maize estimates. <Link to="/about">Data details</Link></span>
         </p>
       </aside>
     </div>

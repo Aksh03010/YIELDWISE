@@ -43,6 +43,22 @@ class NormalizationTests(unittest.TestCase):
 
 
 class WeatherServiceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_default_cache_checks_provider_again_after_one_minute(self):
+        now, calls = [0], []
+
+        def handler(request):
+            calls.append(request)
+            return httpx.Response(200, json=provider_data())
+
+        service = WeatherService(client_factory=lambda: httpx.AsyncClient(transport=httpx.MockTransport(handler)), clock=lambda: now[0])
+        first = await service.get(43.7064, -79.3986)
+        self.assertEqual(first['cacheSeconds'], 60)
+        now[0] = 59
+        self.assertTrue((await service.get(43.7064, -79.3986))['cached'])
+        now[0] = 60
+        self.assertFalse((await service.get(43.7064, -79.3986))['cached'])
+        self.assertEqual(len(calls), 2)
+
     async def test_cache_expiry_bounds_and_failure(self):
         now, calls = [0], []
         failing = [False]

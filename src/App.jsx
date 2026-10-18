@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Workspace from './components/Workspace.jsx'
 import HomePage from './pages/HomePage.jsx'
@@ -14,8 +14,13 @@ import { useModelCatalog } from './hooks/useModelCatalog.js'
 export default function App() {
   const [farm, setFarm] = useState(() => loadFarm(window.localStorage))
   const [storageNotice, setStorageNotice] = useState('')
-  const weatherState = useWeather(farm)
+  const weatherState = useWeather(farm, { pollInterval: 60000 })
   const modelState = useModelCatalog()
+  useEffect(() => {
+    function syncField(event) { if (event.key === 'harvest:field:v2') setFarm(loadFarm(window.localStorage)) }
+    window.addEventListener('storage', syncField)
+    return () => window.removeEventListener('storage', syncField)
+  }, [])
 
   function saveFarm(next) {
     setFarm(next)

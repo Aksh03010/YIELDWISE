@@ -44,7 +44,7 @@ def normalize_weather(data):
 
 
 class WeatherService:
-    def __init__(self, *, client_factory=None, ttl=600, max_entries=128, clock=time.monotonic):
+    def __init__(self, *, client_factory=None, ttl=60, max_entries=128, clock=time.monotonic):
         self.client_factory = client_factory or (lambda: httpx.AsyncClient(timeout=10))
         self.ttl, self.max_entries, self.clock = ttl, max_entries, clock
         self.cache = OrderedDict()
