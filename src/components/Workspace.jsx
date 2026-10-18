@@ -8,7 +8,6 @@ const links = [
   ['/outlook', 'Yield outlook'],
   ['/planning', 'Harvest planning'],
   ['/conditions', 'Field conditions'],
-  ['/market', 'Supply balance'],
   ['/about', 'Data & methodology'],
 ]
 
@@ -50,8 +49,8 @@ export default function Workspace({ children, farm, saveFarm }) {
       <main id="main" className="main">
         {children}
         <footer className="footer">
-          <span>HARVEST research preview. Yield, harvest and market figures are illustrative.</span>
-          <span>Weather via Open-Meteo · Field data stays in this browser</span>
+          <div className="footer-credit"><strong>HARVEST™</strong><span>© {new Date().getFullYear()} Zohaib Mansoor, Shubhang Nath Thakur, Akshit Mesa.</span></div>
+          <div className="footer-details"><Link to="/about">Data & methodology</Link><span>Weather via Open-Meteo · Field profiles saved in this browser</span></div>
         </footer>
       </main>
     </div>

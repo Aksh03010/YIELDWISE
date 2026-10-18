@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { LocateFixed } from 'lucide-react'
 import { FARMS, CROPS, COUNTRIES, validateFarm, fieldHectares, formatNumber as fmt } from '../data/agriculture.js'
 import FieldIllustration from '../components/FieldIllustration.jsx'
+import TypingHeading from '../components/TypingHeading.jsx'
 
 // Field setup: the only place the field profile is edited. Saved to
-// browser storage; coordinates go to Open-Meteo for weather after saving.
+// browser storage; the backend retrieves weather for the saved coordinates.
 export default function FieldEditor({ farm, saveFarm }) {
   const [draft, setDraft] = useState({ ...farm })
   const [errors, setErrors] = useState({})
@@ -48,7 +49,7 @@ export default function FieldEditor({ farm, saveFarm }) {
   return <div className="flow">
     <div className="page-head">
       <div>
-        <h1>Field setup</h1>
+        <TypingHeading text="Field setup" />
         <p className="sub">Coordinates, crop and area for {farm.name}. The profile is stored in this browser only.</p>
       </div>
     </div>
@@ -142,7 +143,7 @@ export default function FieldEditor({ farm, saveFarm }) {
         </section>
 
         <p className="privacy-note">
-          <span>Field details are stored on this device. Coordinates are sent to Open-Meteo to fetch weather after saving. <Link to="/about">Data details</Link></span>
+          <span>Field details are stored on this device. Coordinates are sent to the HARVEST backend, which retrieves Open-Meteo weather after saving. <Link to="/about">Data details</Link></span>
         </p>
       </aside>
     </div>

@@ -11,6 +11,22 @@ node_modules
 dist
 dist-ssr
 *.local
+__pycache__/
+*.pyc
+.venv/
+.backend-deps/
+.build-tmp/
+backend/artifacts/*
+!backend/artifacts/maize_research_artifact.json
+!backend/artifacts/soybean_research_artifact.json
+!backend/artifacts/provenance.json
+!backend/artifacts/README.md
+.env
+.env.*
+!.env.example
+model_training/prepared/
+model_training/soybean_prepared/
+model_training/*_artifacts/
 
 # Editor directories and files
 .vscode/*

@@ -1,0 +1,12 @@
+{
+  "registered_on": "2026-10-18",
+  "source": "CRAN SoyNAM 1.6.2, quality-assured soybase data; GPL-3; cite dataset authors",
+  "targets": ["yield_kg_ha", "seed_protein_percent", "seed_oil_percent", "days_from_planting_to_R8_maturity"],
+  "feature_cutoff": "30 days after planting; no height, flowering, maturity, moisture, lodging, seed-size, yield/protein/oil/fiber outcomes or plot/row IDs as predictors",
+  "features": "Known experimental family/strain, site, year and planting calendar information only initially; include weather only if matched pre-cutoff data are actually collected and verified",
+  "split_rule": "Choose calendar years by sorted distinct source years before inspecting outcomes: all but last two years train, penultimate year validation, last year untouched test. Need at least three years or stop. Keep all plots for environment-year together. Report distinct environment counts.",
+  "candidates": ["training_mean", "training_site_mean_with_global_fallback", "ridge", "small_MLP_on_existing_A100"],
+  "selection": "Validation environment-macro MAE only per target, refit training+validation only after selection, then test once. Keep all scores and baseline comparisons. Fit transforms only on training.",
+  "scope": "Experimental SoyNAM maturity groups late II to early IV in measured US trials. Neither arbitrary commercial seed nor all North America is validated. R8 maturity is a physiological stage, not a learned optimal harvest day. Protein/oil are composition factors, not premium grade probability. Moisture/protein reference basis must be reported unknown if source does not specify it.",
+  "product_rule": "Only saved artifacts with source hashes, units, exact feature schema, held-out errors and domain guards may serve. Surface research domain, unavailable features and data-only limitations in product. No synthetic samples, CPU neural fallback or paid source."
+}

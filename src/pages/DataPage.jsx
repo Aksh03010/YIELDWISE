@@ -1,91 +1,14 @@
+import TypingHeading from '../components/TypingHeading.jsx'
+import { CROPS } from '../data/agriculture.js'
 
-const sources = [
-  { name: 'Browser geolocation', status: 'Available', live: true, description: 'Permission-based device coordinates, with manual entry as an alternative. Confirm that your device is at the field.', url: 'https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API' },
-  { name: 'Open-Meteo', status: 'Connected', live: true, description: 'Current modeled temperature, wind and humidity; surface soil moisture and up to 16 daily forecast dates for harvest planning. The conditions view summarizes the first seven days. Availability is shown per request.', url: 'https://open-meteo.com/en/docs' },
-  { name: 'NASA POWER & remote sensing', status: 'Planned', description: 'Coordinate-based environmental history and satellite vegetation observations are planned inputs. No NASA imagery or NDVI is fetched today.', url: 'https://power.larc.nasa.gov/docs/services/api/' },
-  { name: 'Soil & terrain records', status: 'Planned', description: 'Regional soil surveys, lab measurements and terrain layers will complement the field profile. Weather grid elevation is not a topographic survey.', url: 'https://www.nrcs.usda.gov/resources/data-and-reports/web-soil-survey' },
-  { name: 'Regional production & trade', status: 'Planned', description: 'USDA, Statistics Canada and Mexican official records are intended sources. The balance lab uses editable hypothetical volumes.', url: 'https://www.usda.gov/oce/commodity/wasde' },
-]
-
-const worksToday = [
-  'Save a field with coordinates, crop and area.',
-  'Retrieve modeled weather near that location.',
-  'Explore repeatable sample yield scenarios at 1, 6 and 12 months.',
-  'Compare sample crop potential and export a labeled outlook.',
-  'Compare harvest windows, custom grade chances, risk triggers and operating returns in an illustrative planner.',
-  'Change rainfall, temperature, irrigation and harvest date; import crop-specific grading CSV records locally.',
-  'Explore an editable supply-and-price sensitivity calculation.',
-]
-const needsModel = [
-  'Validated crop-specific inference and training datasets.',
-  'Calibrated prediction intervals and regional backtesting.',
-  'Protein, grade and moisture models for crop quality.',
-  'Regional production aggregation and actual trade feeds.',
-  'Calibrated crop prices and company exposure analysis.',
-]
-
-// Data & methodology: the single place that states what is live, what is a
-// fixture, and how to read every number the other pages show.
-export default function DataPage() {
-  return <div className="flow">
-    <div className="page-head">
-      <div>
-        <h1>Data & methodology</h1>
-        <p className="sub">What is connected, what is illustrative, and how to read an outlook.</p>
-      </div>
-    </div>
-
-    <section className="method-hero">
-      <h2>Field planning across North America</h2>
-      <p>HARVEST is being built for farmers and agricultural companies in Canada, the United States and Mexico. The goal is to connect local growing conditions with harvest yield, crop quality and regional supply planning, and to be explicit about the difference until each piece is validated.</p>
+export default function DataPage({ catalog, modelStatus }) {
+  return <div className="flow"><div className="page-head"><div><TypingHeading text="Data & methodology" /><p className="sub">Measured data, research results and the limits of the current app.</p></div></div>
+    <section className="method-hero"><h2>What HARVEST supports today</h2><p>Save a field, retrieve weather near its coordinates, compare explicit operating assumptions and check measured grain factors. Experimental maize and SoyNAM models are connected through a registry that checks saved inference replays before exposing results.</p></section>
+    <section className="card"><h2>Model coverage</h2><p role="status">{modelStatus === 'loading' ? 'Loading the model registry…' : modelStatus === 'error' ? 'The model service is unavailable; no prediction is substituted.' : catalog?.notice}</p>
+      <div className="table-wrap"><table><thead><tr><th>Crop</th><th>Availability</th><th>Trained targets</th></tr></thead><tbody>{(catalog?.crops || []).map(c => <tr key={c.crop}><td>{CROPS.find(x => x.id === c.crop)?.name || c.crop}</td><td>{c.status === 'research_only' ? 'Research only' : 'Unavailable'}</td><td>{c.targets.length ? c.targets.length : 'None registered'}</td></tr>)}</tbody></table></div>
     </section>
-
-    <div className="two-col">
-      <section className="card">
-        <h2>What you can use today</h2>
-        <ul className="check-list">{worksToday.map(text => <li key={text}>{text}</li>)}</ul>
-      </section>
-      <section className="card">
-        <h2>What still needs a model</h2>
-        <ul className="check-list">{needsModel.map(text => <li className="pending" key={text}>{text}</li>)}</ul>
-      </section>
-    </div>
-
-    <div className="section-head gap-top">
-      <div>
-        <h2>Data connections</h2>
-        <p className="stat-note">Availability is separate from forecast accuracy</p>
-      </div>
-    </div>
-    <div className="sources">
-      {sources.map(({ name, status, live, description, url }) => (
-        <article className="card source-card" key={name}>
-          <div className="src-head">
-            <h3>{name}</h3>
-            <span className={`badge ${live ? 'badge-live' : ''}`}>{status}</span>
-          </div>
-          <p>{description}</p>
-          <a href={url} target="_blank" rel="noreferrer" className="link">Provider documentation</a>
-        </article>
-      ))}
-    </div>
-
-    <section className="card prose">
-      <h2>How to read an outlook</h2>
-      <div className="two-col">
-        <div>
-          <h3>Yield and quality are different.</h3>
-          <p>Yield is harvest mass per unit of land, shown in metric tonnes per hectare (t/ha). Total production is yield multiplied by field area. Grain quality needs different targets and measurements, such as protein, moisture and grade.</p>
-          <h3>A horizon is a planning date.</h3>
-          <p>A one-, six- or twelve-month outlook updates the view of expected harvest yield. It is not a promise that a full crop can be harvested within that period. The demo changes scenario spread by horizon; it does not forecast future weather.</p>
-        </div>
-        <div>
-          <h3>Yield ranges are illustrative.</h3>
-          <p>The current yield engine is a deterministic fixture, not trained AI. Its ranges are illustrative scenario spreads with no statistical coverage claim. Real weather is not yet fed into the yield-outlook calculation.</p><h3>Harvest and grade scenarios need validation.</h3><p>The harvest planner uses explicit demo responses to readiness, weather and delay. Its grade chance uses crop-specific grading records and editable targets, with illustrative adjustments. These are uncalibrated scenario estimates. No matching grading records means no grade probability and standard-price revenue only. Default targets are custom examples, not official grades. Prices and costs are editable USD assumptions.</p>
-          <h3>Your location stays in your control.</h3>
-          <p>Browser permission is required for device location. Your field profile is saved locally in this browser. Coordinates are sent to Open-Meteo for weather, and to OpenStreetMap only when you open its link. We do not infer your field from your IP address.</p>
-        </div>
-      </div>
-    </section>
+    <div className="two-col"><section className="card prose"><h2>Measured trial models</h2><p>Maize uses measured G2F trials and environmental inputs through 30 days after planting. Model selection used 2018 validation data, with 2019–2021 test years and a separate Ontario holdout. Yield, moisture, test weight, silking and recorded harvest operations are distinct targets.</p><p>SoyNAM uses recognized experimental strain, family, site and planting-day information from US trials. The split is 2011 training, 2012 validation and 2013 testing. No matched weather is included. The test year has no protein or oil labels, so those artifacts are unavailable.</p><p>Many trial plots share the same environment. Error counts refer to environments, not independent farms represented by every plot. R8 is a physiological stage; a recorded harvest operation is not an economically optimal date.</p></section>
+      <section className="card prose"><h2>Limits on product use</h2><p>In the October 18, 2026 research run, the selected maize yield model performed worse than its simple held-out baselines. Soybean yield improved only slightly over its baselines in seven test environments, and the selected soybean R8 model did not beat its strongest baseline. These runs do not validate next-season forecasts for arbitrary North American fields.</p><p>The app does not calculate premium-grade probabilities, optimal harvest windows, weather-driven yield changes, crop prices or trading signals. There are no one-, six- or twelve-month sample forecasts in the active interface.</p><p>Financial comparisons use only the quantities, saleable fractions, prices and costs you enter. Measured-factor checks compare your observed value against your own buyer threshold.</p></section></div>
+    <section className="card prose"><h2>Location and environmental data</h2><p>Device location requires browser permission. Field profiles stay in browser storage. Coordinates are posted to the HARVEST backend, which retrieves Open-Meteo weather and caches it for ten minutes. They are sent to OpenStreetMap when you open its link. We do not derive a field from an IP address.</p><p>Weather is modeled near the supplied coordinates. Missing weather remains unavailable. NASA imagery, NDVI, surveyed topography and laboratory soil measurements are not connected to the app. Weather grid elevation is not a field survey.</p><p><a className="link" href="https://open-meteo.com/en/docs" target="_blank" rel="noreferrer">Open-Meteo documentation</a></p></section>
   </div>
 }
