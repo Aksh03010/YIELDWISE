@@ -1,5 +1,4 @@
 # YIELDWISE
-THE GOOGLE COLAB FILES ARE THIS : https://colab.research.google.com/drive/1RNsokNnPXZLm_buU1pM3klDmY2-IqQmY?usp=sharing
 
 YIELDWISE is a field-planning workspace that brings a grower’s field record,
 seven-day weather, transparent operating assumptions, and measured research
@@ -48,6 +47,27 @@ npm run dev
 Open the local URL printed by Vite. The frontend sends `/api` requests to
 `http://127.0.0.1:8000`; the backend binds only to your machine’s loopback
 address.
+
+## Judging guide
+
+| Area | What to look for |
+| --- | --- |
+| Overview | Saved field identity, weather status, and model-service readiness in one place. |
+| Yield outlook | Target availability, held-out error, research scope, and input validation before a prediction is requested. |
+| Harvest planning | Explicit, editable return calculations; changing a date does not invent a yield, grade, or price change. |
+| Field conditions | Weather-based freezing, heat, and rainfall threshold checks that are labeled as checks, not crop-damage probabilities. |
+| Data & methodology | Model coverage, scope, limitations, and data-handling details. |
+
+## Technical approach
+
+| Layer | Implementation |
+| --- | --- |
+| Frontend | React 19, Vite 8, React Router, and custom CSS |
+| API | FastAPI with Pydantic request validation |
+| Model serving | Verified JSON artifacts loaded through a registry; no executable pickle files |
+| Weather | Open-Meteo retrieved server-side with a bounded ten-minute cache |
+| Field persistence | Browser localStorage; no account or cloud database required |
+| Deployment | Docker can serve the built frontend and API on one origin |
 
 The included model artifacts are already available in `backend/artifacts/`.
 The importer validates an export’s SHA256, protocol, schema, source hashes,
