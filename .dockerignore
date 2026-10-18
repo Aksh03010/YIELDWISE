@@ -1,0 +1,12 @@
+.git
+node_modules
+dist
+.backend-deps
+.build-tmp
+.venv
+**/__pycache__
+.env
+.env.*
+model_training/prepared
+model_training/soybean_prepared
+model_training/*_artifacts

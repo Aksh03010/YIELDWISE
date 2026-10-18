@@ -1,38 +1,123 @@
-# Research-model integration notes
+# Verified model integration
 
-These are proposed integration requirements, not an API currently implemented by HARVEST.
+Source: the existing Colab notebook, inspected and edited on October 18, 2026.
+The recovered packet SHA256 is
+`90384ad3d66349bea7c7aaeb141490399bfa822f570a07e9757c102b1296e412`.
+The completed JSON export SHA256 is
+`9e8fd8320d82e3c168e4a1f8a29c1e301aa37b36789064d565a9dc3686bc1d31`.
 
-The harvest-planning frontend now implements date-window selection, target-grade scenarios with local CSV evidence, threshold warnings, what-if controls and itemized date-based operating-return comparisons. Its readiness, quality and crop-loss responses remain deterministic examples. See [the harvest-planning calculation notes](HARVEST_PLANNING.md) before replacing these with inference outputs.
+## Recovery
 
-## Yield and quality inference
+- The original NumPy/GPU check rejected a 0.000061 kg/m3 float32 test-weight
+  difference. Export parity now uses `atol=1e-5, rtol=1e-6` across every MLP
+  test row and records its observed maximum error. Material or nonfinite
+  discrepancies still fail. These tolerances are numerical, not uncertainty.
+- Soybean protein/oil training is unavailable when a frozen split has no labels.
+  Their 2013 test counts are zero; no validated artifact was manufactured.
+- A duplicate Year column broke a maize replay sidecar after all five artifacts
+  had been saved. The sidecar was regenerated with unique columns, with no
+  retraining or model-selection changes. The source is repaired for future runs.
+- A100 allocation was unavailable. The user explicitly authorized T4. CUDA-only
+  training remained in force; the run report records Tesla T4 and PyTorch
+  2.11.0+cu130. Historical candidate names containing A100 are unchanged labels,
+  not a claim about the device used for the recovery.
+- The existing notebook now includes eight ordered hash-checked packet cells,
+  the recovery runner and the JSON export cell. Earlier experiments remain.
 
-`src/services/outlookService.js:createOutlook` currently generates deterministic illustrative fixtures. Replace this fixture boundary with an asynchronous server inference adapter and an explicit loading/error state when the trained endpoint is available. Do not relabel fixtures as trained-model results or silently substitute fixtures when live inference fails.
+## Held-out results
 
-The request should carry verified field coordinates or a surveyed polygon, supported country, crop, cultivar where known, hectares, irrigation, soil information, planting/harvest season, requested outlook horizon and a feature cutoff timestamp. The planting date and soil texture collected by the UI are profile metadata; the demo calculation does not currently use them. Inference should use independently collected, validated features rather than relying on the browser to supply training features.
+| Target | Selected model MAE | Best simple baseline MAE | Test environments |
+| --- | ---: | ---: | ---: |
+| Maize yield (t/ha) | 2.2722 | 2.1434 | 69 |
+| Maize moisture (percentage points) | 3.2478 | 3.2478 | 69 |
+| Maize test weight (kg/m3) | 39.9376 | 39.9508 | 63 |
+| Maize silking (days after planting) | 2.4036 | 6.2743 | 60 |
+| Maize recorded harvest operation (days after planting) | 10.5667 | 12.9143 | 69 |
+| Soybean yield (t/ha) | 0.8667 | 0.8771 | 7 |
+| Soybean R8 maturity (days after planting) | 8.0197 | 7.7371 | 7 |
 
-A response should identify:
+Maize metrics compute absolute error on site-season means. Soybean metrics
+average per-plot absolute errors within each environment, then average
+environments. Compare within a target, not across these averaging rules.
+Validation selected each candidate before test scoring. The selected maize
+moisture model is itself a site-history baseline. Ontario was separate from
+maize fitting and selection; those errors are retained in the exported scores.
 
-- Model version, crop, field, target harvest season and inference timestamp.
-- Expected yield in metric tonnes/hectare and field area in hectares.
-- Low/high prediction interval, its intended coverage and calibration status.
-- Forecast horizon, feature cutoff, source timestamps and missing-data flags.
-- Quality targets with crop-specific units and availability, separately from yield.
-- Supported geography, warnings for out-of-domain inputs and validation metrics.
+These results do not establish future forecasts for arbitrary North American
+farms. No post-test model reselection, calibration or broad geographic
+validation was performed. Missing weather/soil features, commercial soybean
+genotypes and new seasons are not fabricated.
 
-Check field identity, crop, horizon and timestamps before replacing the active outlook. Cancel stale requests on field changes. Validate finite non-negative yield, consistent intervals, correct units and coverage. Store secrets server-side, define CORS deliberately, and include provider freshness and provenance. Do not extrapolate a seven-day weather forecast into a year of weather.
+## Serving contract
 
-## Environmental features
+`GET /api/models` reports crop/target availability, units, required features,
+test errors, research scope and the SHA256 model version. Missing or corrupt
+artifacts remain unavailable. Every registered target must pass its saved
+inference replays. The current exports contain 25 maize and 10 soybean cases.
 
-Current weather uses the documented Open-Meteo forecast endpoint. NASA POWER, actual vegetation indices, soil surveys, slope and terrain are not yet integrated. Align provider grids, spatial resolution, aggregation periods and observation times with the training process. Surface soil moisture is not root-zone moisture. Crop quality may require laboratory labels that cannot be inferred reliably from weather alone.
+The verified JSON exports and run provenance are committed in
+`backend/artifacts/`. Raw prepared datasets and training checkpoints are not.
+`POST /api/weather` accepts validated North American coordinates and retrieves
+modeled Open-Meteo weather through the backend. Results carry model/retrieval
+timestamps and cache status; the cache expires after one minute. Provider
+failures return 503 and missing measurements remain null. The service does
+not pass weather values into a trial model without its required input contract.
 
-## Regional aggregation and markets
+`POST /api/predict` requires `{crop, target, inputs, research_only: true}` and a
+trial `site_id` for the maize site-history baseline. Extra/missing input keys,
+nonfinite numbers and unsupported targets are rejected. Maize serving is
+restricted to the 2014–2021 research years, complete 31-day early weather
+windows and prepared geographic bounds. Soybean rejects unknown strains and
+out-of-bounds planting days; unknown family/site encodings are flagged.
 
-Regional production needs crop-specific harvested area and representative yields, with overlap control and uncertainty aggregation. One user's field is not representative of all North America.
+Saved test replays can include a planting date outside fitted serving bounds.
+Their numeric parity is verified internally; the public endpoint still rejects
+that input. No endpoint substitutes a demo yield, sample weather or price.
 
-Maintain a marketing-year balance by region and crop: opening stocks + production + external imports − domestic use − external exports = ending stocks. Separate food, feed, seed, industrial use and losses; account for inventory revisions and avoid double counting intra-region trade. Population adjustment alone does not constitute a demand model.
+The field workflow automatically runs the maize model when coordinates, actual
+planting date and area are complete, after an 800 ms pause in editing. It checks
+again every minute while visible and when the tab returns to the foreground.
+Polling can be paused; refresh failures retain the previous result only for
+exactly matching field inputs. Current weather loads from coordinates even before
+a planting date is entered. Source retrieval times are distinct from check times:
+rechecking historical planting weather can leave the estimate unchanged.
 
-The current price coefficient is a scenario control. It must be replaced by a validated economic model with actual price history, inventories, trade, currency, policy and other relevant drivers. Long/short strategy evaluation, transaction costs, futures contract handling, company exposure and stock-price impact are separate research tasks. No trade or investment execution exists in the app.
+Installed models are selectable even if the saved field uses an unsupported crop.
+In the separate Trial examples mode, example inputs run through the real backend
+automatically; no example prediction values are stored in frontend code.
+Maize uses a recorded COH1 trial input;
+the soybean example uses a known strain/site and planting day 145 inside fitted
+bounds. Example inputs are separate from the saved field. Editable research
+inputs and model-performance details remain available. There is no calibrated grade probability, economically
+optimal harvest date or causal rainfall/irrigation response model. The
+input-based economics calculator is independent of model predictions.
 
-## Validation before release
+## Experimental location inference
 
-Use crop-, region- and horizon-specific evaluation with temporal and spatial holdouts, target leakage checks, documented yield error and interval coverage, quality-target validation and out-of-distribution handling. Record provenance and license terms for each feed. Add inference-contract and stale-response integration tests when the backend is connected. Extend browser interaction and mobile checks; this session's browser preview inspection was blocked by the app's URL security policy, so only build, service/calculation tests and route-rendering checks were completed here.
+`POST /api/field-forecast` accepts maize, coordinates, planting date, hectares
+and `research_only: true`. This path retrieves actual NASA POWER AG/LST daily
+data for planting through day 30, requires all 31 days for every required
+variable, validates units, and computes the same mean/min/max/sum feature schema.
+Future or incomplete weather windows return an error. It does not borrow trial
+inputs or fill missing days from training medians. Results show coordinates,
+environment summaries, source/version/hash, conversions and model version.
+
+Current NASA AG PAR totals arrive as MJ/m²/day. The frozen G2F features use
+average W/m², consistent with the
+[G2F publication's variable definitions](https://www.genomes2fields.org/docs/publications/2024.02.08.579534v1.full.pdf).
+The adapter converts by 1,000,000/86,400 before aggregation; other unexpected
+units fail. A live COH1 2021 source comparison exposed this mismatch before
+serving. NASA revisions differ slightly from the frozen research snapshot.
+
+This path allows current seasons as explicitly experimental extrapolation and
+reports inputs outside fitted ranges. It does not change `/api/predict`'s strict
+historical trial guards, reselect models, or claim validation on new farms.
+The site-history moisture baseline is excluded from new-field outputs because
+it cannot infer a new field's moisture from coordinates. Yield, test weight,
+silking and recorded harvest timing use their selected environmental models.
+Area multiplies yield into tonnes; it is not a yield predictor. SoyNAM has no
+coordinate/weather predictors and remains in the separate trial-input workflow.
+
+NASA responses are cached for 24 hours in a bounded 128-entry cache keyed by
+coordinates and planting window. Nearby fields can share coarse environmental
+grid data; a point request is not a soil test or satellite field delineation.

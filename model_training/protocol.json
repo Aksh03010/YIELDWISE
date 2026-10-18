@@ -1,0 +1,22 @@
+{
+  "version": "g2f-early-season-v1",
+  "registered_at": "2026-10-18",
+  "purpose": "Train target-specific research models from measured North American maize trials before product inference registration.",
+  "targets": {
+    "yield": "Measured grain yield, normalized to t/ha using the dataset's documented moisture basis",
+    "quality_factor": "Measured harvest grain moisture percent; this is one quality/drying factor, not a grade or protein prediction",
+    "phenology": "Days from planting to silking, if labels exist; this is not optimal harvest timing",
+    "harvest_operation": "Observed harvest date/days after planting, only if actual dates exist; one example per site-season, never duplicate plot rows as independent operations"
+  },
+  "issue_cutoff": "30 days after recorded planting. Use only observations at or before that cutoff. Do not use full-season environment covariates, actual harvest date, grain weight, target-derived traits, row/replicate IDs, silking/anthesis outcomes, or late-season observed weather as predictors.",
+  "primary_split": {"train_years_max": 2017, "validation_years": [2018], "test_years": [2019, 2020, 2021]},
+  "spatial_test": "Ontario site codes excluded from fitting and model selection. Report separately if present; otherwise explicitly unavailable.",
+  "unit_of_independence": "site-season; plots and genotypes are correlated, not independent test seasons",
+  "baselines": ["training_mean", "shrunk_site_history_if_site_identifiers_are_available"],
+  "learned_candidates": ["ridge_with_training_only_scaling", "small_regularized_neural_network_on_existing_A100"],
+  "selection": "Each target selected by validation mean site-season MAE. Test labels are used once for final scoring, not tuning. Keep all candidate scores.",
+  "metrics": ["MAE_in_target_units", "RMSE", "R2", "MAPE_only_for_positive_yield_with_denominator_rule", "site_season_counts", "paired_site_season_errors_against_baselines"],
+  "product_gate": "Saved artifact, schema, units, source hashes, domain bounds, training/test evidence and inference-reload checks required. Research-only results must be labeled. No field agronomy validation, calibrated future grade probability, causal crop-loss response or economically optimal harvest recommendation follows merely from fitting.",
+  "data_failure_rule": "If actual planting metadata or any target is absent, do not fabricate it. Report that target's training as unavailable and use separately labeled existing regional research results only where applicable.",
+  "scope": "No paid services, passwords, CPU neural fallback, trades or deployment. Simple mathematical baselines may fit locally. New neural training uses the existing selected A100 only."
+}

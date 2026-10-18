@@ -1,0 +1,20 @@
+{
+  "export_sha256": "9e8fd8320d82e3c168e4a1f8a29c1e301aa37b36789064d565a9dc3686bc1d31",
+  "run_report": {
+    "started_at": "2026-10-18T16:09:13.916366+00:00",
+    "packet_sha256": "85ec57529102da87d7160c46110987200ecb9ca30cdc0df6ec4b66042a0d7d95",
+    "device": "Tesla T4",
+    "pytorch": "2.11.0+cu130",
+    "runs": {
+      "train_maize_gpu.py": {
+        "status": "complete",
+        "sidecar_repair": "Removed duplicate Year column after all five artifacts had been saved. No retraining or selection changes."
+      },
+      "train_soybean_gpu.py": {
+        "status": "complete"
+      }
+    },
+    "hardware_amendment": "User authorized the available T4 on 2026-10-18 after Colab could not allocate A100. Data, splits, candidates and hyperparameters unchanged.",
+    "finished_at": "2026-10-18T16:10:14.990156+00:00"
+  }
+}

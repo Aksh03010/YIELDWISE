@@ -1,42 +1,57 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LocateFixed } from 'lucide-react'
-import { FARMS, CROPS, COUNTRIES, validateFarm, fieldHectares, formatNumber as fmt } from '../data/agriculture.js'
+import { CROPS, validateFarm, fieldHectares, formatNumber as fmt } from '../data/agriculture.js'
 import FieldIllustration from '../components/FieldIllustration.jsx'
+import TypingHeading from '../components/TypingHeading.jsx'
+import { getDeviceLocation } from '../services/locationService.js'
 
 // Field setup: the only place the field profile is edited. Saved to
-// browser storage; coordinates go to Open-Meteo for weather after saving.
+// browser storage; the backend retrieves weather for the saved coordinates.
 export default function FieldEditor({ farm, saveFarm }) {
   const [draft, setDraft] = useState({ ...farm })
   const [errors, setErrors] = useState({})
   const [locating, setLocating] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
+  const locationRequest = useRef(null)
   const navigate = useNavigate()
+  useEffect(() => () => { locationRequest.current?.abort(); locationRequest.current = null }, [])
+
+  function stopLocating() {
+    locationRequest.current?.abort()
+    locationRequest.current = null
+    setLocating(false)
+  }
 
   function update(key, value) {
+    if (key === 'latitude' || key === 'longitude') { stopLocating(); setLocationMessage('Using the coordinates you entered. Confirm them before saving.') }
     setDraft(previous => ({ ...previous, [key]: value }))
     setErrors(previous => ({ ...previous, [key]: null }))
   }
-  function locate() {
-    if (!navigator.geolocation) { setLocationMessage('Location is unavailable in this browser. Enter your field coordinates below.'); return }
+  async function locate() {
+    stopLocating()
+    const controller = new AbortController()
+    locationRequest.current = controller
     setLocating(true)
-    setLocationMessage('Waiting for your browser’s location permission…')
-    navigator.geolocation.getCurrentPosition(position => {
-      setDraft(previous => ({ ...previous, latitude: Number(position.coords.latitude.toFixed(6)), longitude: Number(position.coords.longitude.toFixed(6)) }))
-      setLocating(false)
-      setLocationMessage(`Device location added (accuracy about ${Math.round(position.coords.accuracy)} m). Confirm this is your field, then check its country and region below.`)
-    }, error => {
-      setLocating(false)
-      setLocationMessage(error.code === 1 ? 'Location permission was declined. You can enter your field coordinates manually.' : 'Could not determine your location. Enter coordinates manually or try again outdoors.')
-    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 })
+    setLocationMessage('Checking device location. If prompted, allow location access. This will stop after 12 seconds.')
+    try {
+      const position = await getDeviceLocation({ signal: controller.signal })
+      if (controller.signal.aborted) return
+      setDraft(previous => ({ ...previous, latitude: position.latitude, longitude: position.longitude }))
+      setErrors(previous => ({ ...previous, latitude: null, longitude: null }))
+      setLocationMessage(`Device coordinates added${position.accuracy === null ? '' : ` (accuracy about ${position.accuracy} m)`}. Confirm this is your field before saving.`)
+    } catch (error) { if (!controller.signal.aborted) setLocationMessage(error.message) }
+    finally { if (locationRequest.current === controller) { locationRequest.current = null; setLocating(false) } }
   }
   function submit(event) {
     event.preventDefault()
-    const nextErrors = validateFarm(draft)
+    stopLocating()
+    const nextField = { ...draft, name: `${fmt(Number(draft.latitude), 4)}°, ${fmt(Number(draft.longitude), 4)}°`, country: '', region: '', locality: '' }
+    const nextErrors = validateFarm(nextField)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) { document.getElementById(Object.keys(nextErrors)[0])?.focus(); return }
-    saveFarm({ ...draft, id: `field-${Date.now()}`, latitude: Number(draft.latitude), longitude: Number(draft.longitude), area: Number(draft.area), sample: false })
-    navigate('/')
+    saveFarm({ ...nextField, id: `field-${Date.now()}`, latitude: Number(draft.latitude), longitude: Number(draft.longitude), area: Number(draft.area), sample: false })
+    navigate('/outlook')
   }
   function input(key, label, type = 'text', attributes = {}) {
     return <label className="field" htmlFor={key}>{label}
@@ -48,8 +63,8 @@ export default function FieldEditor({ farm, saveFarm }) {
   return <div className="flow">
     <div className="page-head">
       <div>
-        <h1>Field setup</h1>
-        <p className="sub">Coordinates, crop and area for {farm.name}. The profile is stored in this browser only.</p>
+        <TypingHeading text="Field setup" />
+        <p className="sub">Coordinates, crop and area for your field. The profile is stored in this browser only.</p>
       </div>
     </div>
 
@@ -58,20 +73,15 @@ export default function FieldEditor({ farm, saveFarm }) {
         <section className="card">
           <div className="step-head">
             <span className="step-num">01</span>
-            <div><h2>Find your field</h2><p>Use your device location or enter coordinates directly.</p></div>
+            <div><h2>Find your field</h2><p>Use device location or enter latitude and longitude.</p></div>
           </div>
           <button className="locate-btn" type="button" onClick={locate} disabled={locating}>
             <LocateFixed size={21} />
-            <span><strong>{locating ? 'Finding your location…' : 'Use my current location'}</strong><small>Your browser will ask for permission</small></span>
+            <span><strong>{locating ? 'Finding your location…' : 'Use my current location'}</strong><small>Requires browser permission. You can also enter coordinates manually.</small></span>
           </button>
+          {locating && <button className="link" type="button" onClick={() => { stopLocating(); setLocationMessage('Device lookup cancelled. Enter coordinates manually.') }}>Cancel device lookup</button>}
           {locationMessage && <p className="msg" role="status">{locationMessage}</p>}
           <div className="form-grid">
-            {input('name', 'Field name', 'text', { autoComplete: 'off', maxLength: 80 })}
-            <label className="field" htmlFor="country">Country
-              <select id="country" value={draft.country} onChange={e => update('country', e.target.value)}>{COUNTRIES.map(country => <option key={country}>{country}</option>)}</select>
-            </label>
-            {input('region', 'State / province', 'text', { maxLength: 80 })}
-            {input('locality', 'Town / local area (optional)', 'text', { maxLength: 80 })}
             {input('latitude', 'Latitude (° N)', 'number', { step: 'any', min: 14, max: 84 })}
             {input('longitude', 'Longitude (° E; use negative for west)', 'number', { step: 'any', min: -180, max: -50 })}
           </div>
@@ -111,7 +121,7 @@ export default function FieldEditor({ farm, saveFarm }) {
           </div>
           <div className="form-actions">
             <Link to="/" className="btn btn-ghost">Cancel</Link>
-            <button className="btn" type="submit" disabled={locating}>Save field & view outlook</button>
+            <button className="btn" type="submit">Save field & view outlook</button>
           </div>
         </section>
       </form>
@@ -120,8 +130,8 @@ export default function FieldEditor({ farm, saveFarm }) {
         <section className="card card-flush">
           <FieldIllustration compact />
           <div className="setup-summary summary-pad">
-            <h2>{draft.name || 'Your new field'}</h2>
-            <p> {draft.region || 'Choose your region'}, {draft.country}</p>
+            <h2>Your field coordinates</h2>
+            <p>{fmt(Number(draft.latitude), 4)}°, {fmt(Number(draft.longitude), 4)}°</p>
             <div className="setup-stats">
               <div><small>AREA</small><strong>{fmt(fieldHectares(draft))} ha</strong></div>
               <div><small>CROP</small><strong>{CROPS.find(c => c.id === draft.crop)?.name}</strong></div>
@@ -130,19 +140,8 @@ export default function FieldEditor({ farm, saveFarm }) {
           </div>
         </section>
 
-        <section className="card samples">
-          <h3>Just exploring?</h3>
-          <p>Start from a sample farm, then edit anything before saving.</p>
-          {FARMS.map(sample => (
-            <button type="button" className="sample-btn" key={sample.id}
-              onClick={() => { setDraft({ ...sample }); setErrors({}); setLocationMessage('Sample field loaded. You can edit its details before saving.') }}>
-              <span>{sample.name}<small>{sample.region}, {sample.country}</small></span>
-            </button>
-          ))}
-        </section>
-
         <p className="privacy-note">
-          <span>Field details are stored on this device. Coordinates are sent to Open-Meteo to fetch weather after saving. <Link to="/about">Data details</Link></span>
+          <span>Field details are stored on this device. The backend retrieves Open-Meteo weather after saving. In Yield outlook, complete field inputs automatically send coordinates and planting dates to NASA POWER for maize estimates. <Link to="/about">Data details</Link></span>
         </p>
       </aside>
     </div>

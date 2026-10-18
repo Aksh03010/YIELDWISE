@@ -1,9 +1,10 @@
 export const CROPS = [
-  { id: 'wheat', name: 'Wheat', variety: 'Hard red spring', base: 3.8, color: '#b6a15e', price: 240 },
-  { id: 'corn', name: 'Corn', variety: 'Grain corn', base: 10.2, color: '#d4b754', price: 185 },
-  { id: 'soybeans', name: 'Soybeans', variety: 'Commodity soybean', base: 3.1, color: '#78926e', price: 410 },
-  { id: 'canola', name: 'Canola', variety: 'Spring canola', base: 2.4, color: '#d5c661', price: 470 },
-  { id: 'barley', name: 'Barley', variety: 'Feed barley', base: 4.3, color: '#ac9875', price: 205 },
+  { id: 'wheat', name: 'Wheat', variety: 'Hard red spring' },
+  { id: 'corn', name: 'Corn', variety: 'Grain corn' },
+  { id: 'soybeans', name: 'Soybeans', variety: 'Commodity soybean' },
+  { id: 'rice', name: 'Rice', variety: '' },
+  { id: 'canola', name: 'Canola', variety: 'Spring canola' },
+  { id: 'barley', name: 'Barley', variety: 'Feed barley' },
 ]
 
 // Product fixtures, not official agricultural statistics or market quotes.
@@ -13,7 +14,6 @@ export const FARMS = [
   { id: 'sonora', name: 'Valle del Yaqui', country: 'Mexico', region: 'Sonora', locality: 'Ciudad Obregón', latitude: 27.4864, longitude: -109.9408, crop: 'wheat', variety: 'Durum', area: 100, areaUnit: 'ha', soil: 'Clay loam', irrigation: 'Surface irrigation', plantingDate: '', sample: true },
 ]
 export const COUNTRIES = ['Canada', 'United States', 'Mexico']
-export const HORIZONS = [1, 6, 12]
 export const AREA_TO_HA = 0.40468564224
 export const fieldHectares = farm => Number(farm.area) * (farm.areaUnit === 'ac' ? AREA_TO_HA : 1)
 export const formatNumber = (value, digits = 1) => Number.isFinite(value)
@@ -23,8 +23,6 @@ export const formatNumber = (value, digits = 1) => Number.isFinite(value)
 export function validateFarm(farm) {
   const errors = {}
   if (!farm.name?.trim()) errors.name = 'Give your field a name.'
-  if (!COUNTRIES.includes(farm.country)) errors.country = 'Choose a supported country.'
-  if (!farm.region?.trim()) errors.region = 'Enter your state or province.'
   if (!CROPS.some(c => c.id === farm.crop)) errors.crop = 'Choose a crop.'
   if (!Number.isFinite(Number(farm.area)) || Number(farm.area) <= 0) errors.area = 'Enter an area greater than zero.'
   const lat = Number(farm.latitude), lon = Number(farm.longitude)
