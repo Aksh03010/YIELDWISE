@@ -11,7 +11,14 @@ test('all six workspace routes render with expected content', async () => {
   globalThis.window = { localStorage: { getItem: () => null } }
   try {
     const { default: App } = await server.ssrLoadModule('/src/App.jsx')
-    const paths = [['/', 'Your farm, in focus.'], ['/results', 'Look ahead. Plan with perspective.'], ['/predict', 'Good forecasts start here.'], ['/environmental', 'A closer look at your land.'], ['/market', 'From field to bigger picture.'], ['/about', 'Know what’s behind the numbers.']]
+    const paths = [
+      ['/', 'Prairie View Farm'],
+      ['/outlook', 'Yield outlook'],
+      ['/field', 'Field setup'],
+      ['/conditions', 'Field conditions'],
+      ['/market', 'Supply balance lab'],
+      ['/about', 'Data &amp; methodology'],
+    ]
     for (const [path, expected] of paths) {
       const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: [path] }, createElement(App)))
       assert.ok(html.includes(expected), `${path} did not render its content`)

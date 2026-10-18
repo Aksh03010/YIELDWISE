@@ -21,17 +21,17 @@ npm run build # production assets in dist/
 npm run preview
 ```
 
-Production hosting must serve `index.html` for client routes such as `/results`, `/predict` and `/market`.
+Production hosting must serve `index.html` for client routes such as `/outlook`, `/conditions` and `/market`.
 
 ## The workspace
 
-- **Overview:** field illustration, harvest metrics, sample yield history, crop comparison and current weather status.
-- **Yield outlook:** 1-, 6- and 12-month planning horizons, with dry, typical and wetter-season scenarios. Values are in metric tonnes/hectare; total production uses the field area. Acres convert using `1 acre = 0.40468564224 hectares`.
+- **Overview:** a bento overview — field identity, current conditions, headline yield and production numbers, the yield trend chart, and entry points to the working pages.
+- **Yield outlook:** the yield workbench. 1-, 6- and 12-month planning horizons with dry, typical and wetter-season scenarios; the chart, scenario range, crop comparison and CSV export live here. Values are in metric tonnes/hectare; total production uses the field area. Acres convert using `1 acre = 0.40468564224 hectares`.
 - **Field setup:** browser geolocation on user request, manual coordinates, crop and variety, area, irrigation, planting date and soil texture. Three sample farms provide starting points. Field profiles persist in browser local storage.
 - **Field conditions:** current modeled air temperature, humidity and wind, modeled surface soil moisture (0–1 cm), grid elevation, and a seven-day weather forecast from Open-Meteo. Provider failures show clearly marked sample data. Missing live values show a dash.
-- **Supply & markets:** editable opening inventories, production, imports, domestic use, exports, growth assumptions, a reference price and a sensitivity factor. Volumes are hypothetical million metric tonnes, for one marketing year. Region selection labels the scenario; it does not fetch official statistics.
+- **Supply balance:** editable opening inventories, production, imports, domestic use, exports, growth assumptions, a reference price and a sensitivity factor. Volumes are hypothetical million metric tonnes, for one marketing year. Region selection labels the scenario; it does not fetch official statistics.
 - **Data & methodology:** available and planned sources, model limitations, units and location handling.
-- **Export:** a CSV field outlook labeled illustrative, with coordinates, area, horizon, yield range, production and generation time.
+- **Export:** a CSV field outlook labeled illustrative, with coordinates, area, horizon, yield range, production and generation time (from the Yield outlook page).
 
 ## What the numbers mean
 
