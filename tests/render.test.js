@@ -22,7 +22,7 @@ test('workspace renders supported tools without simulated forecasts or missing-d
       assert.ok(html.includes('HARVEST™'))
       assert.ok(!html.includes('class="badge'))
       for (const retired of ['vs. sample last season', 'Relative potential', 'Planning horizon', 'Illustrative fixture', 'Interactive what-if simulator']) assert.ok(!html.includes(retired), `${path} exposes a retired fixture`)
-      if (path === '/outlook') assert.ok(html.includes('Farm forecast unavailable'))
+      if (path === '/outlook') assert.ok(html.includes('Connecting to the models') && !html.includes('Farm forecast unavailable'))
       if (path === '/conditions') {
         assert.equal((html.match(/class="day"/g) || []).length, 0)
         assert.ok(html.includes('Daily forecast unavailable.'))
@@ -41,8 +41,10 @@ test('workspace renders supported tools without simulated forecasts or missing-d
       const catalog = { crops: [{ crop, status: 'research_only', scope: artifact.manifest.scope || artifact.manifest.geography,
         targets: Object.entries(artifact.targets).map(([id, target]) => ({ id, ...target })) }] }
       const outlook = renderToStaticMarkup(createElement(Outlook, { farm: { ...FARMS[0], crop }, catalog, modelStatus: 'ready' }))
-      assert.ok(outlook.includes('Trained research targets') && outlook.includes('Grain yield'))
-      assert.ok(outlook.includes('Farm forecast unavailable') && !outlook.includes('premium-grade probability:'))
+      assert.ok(outlook.includes('Run the trained model') && outlook.includes('Predicted grain yield'))
+      assert.ok(outlook.includes('Backend connected') && !outlook.includes('Farm forecast unavailable'))
+      const wheatOutlook = renderToStaticMarkup(createElement(Outlook, { farm: FARMS[0], catalog, modelStatus: 'ready' }))
+      assert.ok(wheatOutlook.includes('Prediction model') && wheatOutlook.includes('Run the trained model'), 'A saved wheat field must not hide installed models')
     }
     const weather = { modelTime: '2026-10-18T12:00', fetchedAt: '2026-10-18T16:00:00Z', days: Array.from({ length: 16 }, (_, i) => ({ date: `2026-10-${String(18 + i).padStart(2, '0')}`, min: i === 0 ? -1 : 5, max: 20, rain: 0, code: 1 })) }
     const weatherHtml = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(Conditions, { farm: FARMS[0], weather, status: 'ready' })))

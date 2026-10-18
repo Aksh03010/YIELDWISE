@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import math
 import unittest
 from .inference import ModelRegistry, predict_target
@@ -62,6 +63,16 @@ class InstalledArtifactTests(unittest.TestCase):
                     self.assertNotIn('id="root"', client.get('/api/not-a-route').text)
         finally:
             main.registry = original
+
+    def test_frontend_example_inputs_run_every_connected_target(self):
+        examples = json.loads((Path(__file__).parent.parent / 'src/data/modelExamples.json').read_text())
+        for crop, example in examples.items():
+            self.assertNotIn('predictions', example)
+            for target in self.registry.models[crop]['artifact']['targets']:
+                with self.subTest(crop=crop, target=target):
+                    result = self.registry.predict(crop, target, example['inputs'], example['siteId'] or None)
+                    self.assertTrue(math.isfinite(result['value']))
+                    self.assertTrue(result['research_only'])
 
 
 if __name__ == '__main__':

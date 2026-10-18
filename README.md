@@ -40,12 +40,16 @@ changes before committing. Raw prepared datasets and checkpoints are excluded.
 ## Current workspace
 
 - Overview: field identity, actual weather availability and model readiness.
-- Yield outlook: availability, held-out errors and an explicit research-input
-  form. Unsupported fields, targets and years return no prediction.
+- Yield outlook: select an installed model regardless of the saved field crop.
+  Example inputs run automatically against the actual backend, with editable
+  trial inputs and visible yield, quality-factor and timing outputs. Example
+  runs are separate from the saved field; unsupported targets/years remain rejected.
 - Harvest planning: input-based quantity, saleable fraction, price and cost
   comparisons; measured grain-factor checks against buyer thresholds.
 - Field setup: coordinates, crop, variety, area and management records saved in
-  browser storage. Rice may be recorded even though no rice model is installed.
+  browser storage. Device lookup has its own 12-second deadline and cancellation;
+  town/postcode search is available without device location. Rice may be recorded
+  even though no rice model is installed.
 - Field conditions: seven-day Open-Meteo weather and transparent freezing,
   heat and rainfall threshold checks. These are not crop-damage probabilities.
 - Data & methodology: research scope and product limitations.
@@ -87,3 +91,6 @@ backend, which retrieves Open-Meteo weather and caches results for ten minutes.
 They are also sent to OpenStreetMap when its link is opened. Research inputs
 are sent to the model service only when the research form is submitted.
 NASA imagery, NDVI and soil/terrain data services are not connected.
+Town/postcode queries are sent directly to Open-Meteo's GeoNames geocoding
+service only when Search is pressed. Town coordinates require confirmation
+or adjustment to the field. The app does not substitute an IP-derived location.

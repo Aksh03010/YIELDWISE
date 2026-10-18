@@ -11,7 +11,7 @@ export default function HomePage({ farm, weather, status, refreshWeather, catalo
       <TypingHeading text={farm.name} />
       <p className="stat-note field-status">{farm.sample ? 'Sample field profile' : 'Saved in this browser'}</p>
       <p className="sub">{farm.region}, {farm.country} · {crop?.name} · {fmt(fieldHectares(farm), 0)} ha</p>
-      <div className="tile-actions"><Link className="btn btn-sun" to="/outlook">View model availability</Link><Link className="link link-dark" to="/field">Edit field details</Link></div>
+      <div className="tile-actions"><Link className="btn btn-sun" to="/outlook">Run a prediction</Link><Link className="link link-dark" to="/field">Edit field details</Link></div>
     </section>
     <section className="card span-5">
       <div className="tile-head"><h2>Conditions now</h2><button className="btn btn-small btn-ghost" disabled={status === 'loading'} onClick={refreshWeather}>Refresh</button></div>
@@ -22,9 +22,9 @@ export default function HomePage({ farm, weather, status, refreshWeather, catalo
     </section>
     <section className="card card-sun span-6">
       <h2>Yield outlook</h2>
-      <p className="tile-copy">{modelStatus === 'loading' ? 'Checking the model registry…' : modelStatus === 'error' ? 'The model service is unavailable.' : model?.status === 'research_only' ? 'Experimental trial models are available for this crop. A forecast for this farm has not been validated.' : `A validated ${crop?.name.toLowerCase() || 'crop'} model is not available for this field.`}</p>
-      <p className="stat-note">Farm yield and production estimates will appear only when the model supports the field and its required inputs.</p>
-      <Link className="link" to="/outlook">Review model scope</Link>
+      <p className="tile-copy">{modelStatus === 'loading' ? 'Connecting to the trained models…' : modelStatus === 'error' ? 'Reconnect to the backend to run predictions.' : model?.status === 'research_only' ? 'Run the trained crop model for yield and its available quality or timing targets.' : 'Run the available maize and soybean models with a ready-to-use example or your own experimental inputs.'}</p>
+      <p className="stat-note">Results are calculated by the model service. Example inputs are separate from your saved field.</p>
+      <Link className="link" to="/outlook">Open prediction models</Link>
     </section>
     <section className="card card-flush span-6"><FieldIllustration /><div className="field-caption"><strong>{fmt(Number(farm.latitude), 4)}°, {fmt(Number(farm.longitude), 4)}°</strong><span>Field illustration</span></div></section>
     <section className="card span-6"><h2>Harvest planning</h2><p className="tile-copy">Compare quantities, saleable fractions, prices and costs you supply. Check a measured grain factor against a buyer's threshold.</p><Link className="link" to="/planning">Open planning tools</Link></section>

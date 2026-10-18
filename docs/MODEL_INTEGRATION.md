@@ -74,8 +74,12 @@ Saved test replays can include a planting date outside fitted serving bounds.
 Their numeric parity is verified internally; the public endpoint still rejects
 that input. No endpoint substitutes a demo yield, sample weather or price.
 
-The frontend does not infer yield automatically from a field profile. Its
-research form exposes the exact input requirement and shows outputs with scope
-and error information. There is no calibrated grade probability, economically
+The frontend does not infer yield automatically from a field profile. Installed
+models are selectable even if the saved field uses an unsupported crop. The
+example inputs run through the real backend automatically; no example prediction
+values are stored in frontend code. Maize uses a recorded COH1 trial input;
+the soybean example uses a known strain/site and planting day 145 inside fitted
+bounds. Example inputs are separate from the saved field. Editable research
+inputs and model-performance details remain available. There is no calibrated grade probability, economically
 optimal harvest date or causal rainfall/irrigation response model. The
 input-based economics calculator is independent of model predictions.
