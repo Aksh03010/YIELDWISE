@@ -14,7 +14,7 @@ test('invalid, missing and out-of-region coordinates and areas are rejected', ()
   for (const area of ['', -5, 0, Infinity, 'bad']) assert.ok(validateFarm({ ...FARMS[0], area }).area)
   for (const latitude of ['', -1, 90, NaN]) assert.ok(validateFarm({ ...FARMS[0], latitude }).latitude)
   for (const longitude of ['', 30, -181, NaN]) assert.ok(validateFarm({ ...FARMS[0], longitude }).longitude)
-  assert.ok(validateFarm({ ...FARMS[0], country: 'France' }).country)
+  assert.deepEqual(validateFarm({ ...FARMS[0], country: '', region: '' }), {})
 })
 test('broken, outdated and unavailable storage recover to a sample field', () => {
   for (const data of ['{', 'null', '{}', '{"name":"old"}']) {

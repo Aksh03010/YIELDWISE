@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LocateFixed } from 'lucide-react'
-import { FARMS, CROPS, COUNTRIES, validateFarm, fieldHectares, formatNumber as fmt } from '../data/agriculture.js'
+import { CROPS, validateFarm, fieldHectares, formatNumber as fmt } from '../data/agriculture.js'
 import FieldIllustration from '../components/FieldIllustration.jsx'
 import TypingHeading from '../components/TypingHeading.jsx'
-import { getDeviceLocation, searchLocations } from '../services/locationService.js'
+import { getDeviceLocation } from '../services/locationService.js'
 
 // Field setup: the only place the field profile is edited. Saved to
 // browser storage; the backend retrieves weather for the saved coordinates.
@@ -13,14 +13,9 @@ export default function FieldEditor({ farm, saveFarm }) {
   const [errors, setErrors] = useState({})
   const [locating, setLocating] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
-  const [query, setQuery] = useState('')
-  const [places, setPlaces] = useState([])
-  const [searchStatus, setSearchStatus] = useState('')
-  const [searching, setSearching] = useState(false)
   const locationRequest = useRef(null)
-  const searchRequest = useRef(null)
   const navigate = useNavigate()
-  useEffect(() => () => { locationRequest.current?.abort(); locationRequest.current = null; searchRequest.current?.abort(); searchRequest.current = null }, [])
+  useEffect(() => () => { locationRequest.current?.abort(); locationRequest.current = null }, [])
 
   function stopLocating() {
     locationRequest.current?.abort()
@@ -44,38 +39,18 @@ export default function FieldEditor({ farm, saveFarm }) {
       if (controller.signal.aborted) return
       setDraft(previous => ({ ...previous, latitude: position.latitude, longitude: position.longitude }))
       setErrors(previous => ({ ...previous, latitude: null, longitude: null }))
-      setLocationMessage(`Device coordinates added${position.accuracy === null ? '' : ` (accuracy about ${position.accuracy} m)`}. Confirm this is your field and check its country and region below.`)
+      setLocationMessage(`Device coordinates added${position.accuracy === null ? '' : ` (accuracy about ${position.accuracy} m)`}. Confirm this is your field before saving.`)
     } catch (error) { if (!controller.signal.aborted) setLocationMessage(error.message) }
     finally { if (locationRequest.current === controller) { locationRequest.current = null; setLocating(false) } }
-  }
-  async function findPlaces() {
-    searchRequest.current?.abort()
-    const controller = new AbortController()
-    searchRequest.current = controller
-    const timer = setTimeout(() => controller.abort('timeout'), 10000)
-    setSearching(true); setPlaces([]); setSearchStatus('Searching…')
-    try {
-      const found = await searchLocations(query, { country: draft.country, signal: controller.signal })
-      if (controller.signal.aborted) return
-      setPlaces(found)
-      setSearchStatus(found.length ? 'Choose a result to fill country, region and coordinates.' : 'No matching places in this country. Try a nearby town or enter coordinates.')
-    } catch (error) { if (searchRequest.current === controller) setSearchStatus(controller.signal.aborted ? 'Location search timed out. Retry or enter coordinates directly.' : error.message) }
-    finally { clearTimeout(timer); if (searchRequest.current === controller) { searchRequest.current = null; setSearching(false) } }
-  }
-  function choosePlace(place) {
-    stopLocating()
-    setDraft(previous => ({ ...previous, country: place.country, region: place.region, locality: place.locality, latitude: place.latitude, longitude: place.longitude }))
-    setErrors(previous => ({ ...previous, country: null, region: null, latitude: null, longitude: null }))
-    setPlaces([]); setSearchStatus('')
-    setLocationMessage(`${place.locality} selected. These are town coordinates; adjust them to your field before saving.`)
   }
   function submit(event) {
     event.preventDefault()
     stopLocating()
-    const nextErrors = validateFarm(draft)
+    const nextField = { ...draft, name: `${fmt(Number(draft.latitude), 4)}°, ${fmt(Number(draft.longitude), 4)}°`, country: '', region: '', locality: '' }
+    const nextErrors = validateFarm(nextField)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) { document.getElementById(Object.keys(nextErrors)[0])?.focus(); return }
-    saveFarm({ ...draft, id: `field-${Date.now()}`, latitude: Number(draft.latitude), longitude: Number(draft.longitude), area: Number(draft.area), sample: false })
+    saveFarm({ ...nextField, id: `field-${Date.now()}`, latitude: Number(draft.latitude), longitude: Number(draft.longitude), area: Number(draft.area), sample: false })
     navigate('/outlook')
   }
   function input(key, label, type = 'text', attributes = {}) {
@@ -89,7 +64,7 @@ export default function FieldEditor({ farm, saveFarm }) {
     <div className="page-head">
       <div>
         <TypingHeading text="Field setup" />
-        <p className="sub">Coordinates, crop and area for {farm.name}. The profile is stored in this browser only.</p>
+        <p className="sub">Coordinates, crop and area for your field. The profile is stored in this browser only.</p>
       </div>
     </div>
 
@@ -98,28 +73,15 @@ export default function FieldEditor({ farm, saveFarm }) {
         <section className="card">
           <div className="step-head">
             <span className="step-num">01</span>
-            <div><h2>Find your field</h2><p>Use device location, search for a nearby town, or enter coordinates.</p></div>
+            <div><h2>Find your field</h2><p>Use device location or enter latitude and longitude.</p></div>
           </div>
           <button className="locate-btn" type="button" onClick={locate} disabled={locating}>
             <LocateFixed size={21} />
-            <span><strong>{locating ? 'Finding your location…' : 'Use my current location'}</strong><small>Requires browser permission. Town search works without it.</small></span>
+            <span><strong>{locating ? 'Finding your location…' : 'Use my current location'}</strong><small>Requires browser permission. You can also enter coordinates manually.</small></span>
           </button>
-          {locating && <button className="link" type="button" onClick={() => { stopLocating(); setLocationMessage('Device lookup cancelled. Search for a town or enter coordinates.') }}>Cancel device lookup</button>}
+          {locating && <button className="link" type="button" onClick={() => { stopLocating(); setLocationMessage('Device lookup cancelled. Enter coordinates manually.') }}>Cancel device lookup</button>}
           {locationMessage && <p className="msg" role="status">{locationMessage}</p>}
-          <div className="location-search">
-            <label className="field" htmlFor="location-query">Town or postcode in {draft.country}<input id="location-query" value={query} maxLength={120} placeholder="e.g. Toronto or Regina" onChange={event => { searchRequest.current?.abort(); searchRequest.current = null; setSearching(false); setQuery(event.target.value); setPlaces([]); setSearchStatus('') }} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); findPlaces() } }} /></label>
-            <button className="btn btn-ghost" type="button" disabled={searching || query.trim().length < 2} onClick={findPlaces}>{searching ? 'Searching…' : 'Search location'}</button>
-          </div>
-          {searchStatus && <p className="helper" role="status">{searchStatus}</p>}
-          {places.length > 0 && <ul className="location-results" aria-label="Matching places">{places.map(place => <li key={place.id}><button type="button" onClick={() => choosePlace(place)}><strong>{place.locality}</strong><span>{[place.region, place.country].filter(Boolean).join(', ')} · {fmt(place.latitude, 4)}, {fmt(place.longitude, 4)}</span></button></li>)}</ul>}
-          <p className="helper">Town search uses Open-Meteo / GeoNames. It finds a place centre, not a field boundary. Search text is sent when you press Search.</p>
           <div className="form-grid">
-            {input('name', 'Field name', 'text', { autoComplete: 'off', maxLength: 80 })}
-            <label className="field" htmlFor="country">Country
-              <select id="country" value={draft.country} onChange={e => { update('country', e.target.value); searchRequest.current?.abort(); searchRequest.current = null; setSearching(false); setPlaces([]); setSearchStatus('') }}>{COUNTRIES.map(country => <option key={country}>{country}</option>)}</select>
-            </label>
-            {input('region', 'State / province', 'text', { maxLength: 80 })}
-            {input('locality', 'Town / local area (optional)', 'text', { maxLength: 80 })}
             {input('latitude', 'Latitude (° N)', 'number', { step: 'any', min: 14, max: 84 })}
             {input('longitude', 'Longitude (° E; use negative for west)', 'number', { step: 'any', min: -180, max: -50 })}
           </div>
@@ -168,25 +130,14 @@ export default function FieldEditor({ farm, saveFarm }) {
         <section className="card card-flush">
           <FieldIllustration compact />
           <div className="setup-summary summary-pad">
-            <h2>{draft.name || 'Your new field'}</h2>
-            <p> {draft.region || 'Choose your region'}, {draft.country}</p>
+            <h2>Your field coordinates</h2>
+            <p>{fmt(Number(draft.latitude), 4)}°, {fmt(Number(draft.longitude), 4)}°</p>
             <div className="setup-stats">
               <div><small>AREA</small><strong>{fmt(fieldHectares(draft))} ha</strong></div>
               <div><small>CROP</small><strong>{CROPS.find(c => c.id === draft.crop)?.name}</strong></div>
             </div>
             <p className="helper">Illustration only. No field boundary has been surveyed.</p>
           </div>
-        </section>
-
-        <section className="card samples">
-          <h3>Just exploring?</h3>
-          <p>Start from a sample farm, then edit anything before saving.</p>
-          {FARMS.map(sample => (
-            <button type="button" className="sample-btn" key={sample.id}
-              onClick={() => { stopLocating(); searchRequest.current?.abort(); searchRequest.current = null; setSearching(false); setPlaces([]); setSearchStatus(''); setDraft({ ...sample }); setErrors({}); setLocationMessage('Sample field loaded. You can edit its details before saving.') }}>
-              <span>{sample.name}<small>{sample.region}, {sample.country}</small></span>
-            </button>
-          ))}
         </section>
 
         <p className="privacy-note">

@@ -13,24 +13,24 @@ export function getDeviceLocation({ geolocation = globalThis.navigator?.geolocat
     }
     function abort() { finish(new DOMException('Location request cancelled', 'AbortError')) }
     if (signal?.aborted) { abort(); return }
-    if (!geolocation) { finish(new Error('Device location is unavailable in this browser. Search for a town or enter coordinates.')); return }
+    if (!geolocation) { finish(new Error('Device location is unavailable in this browser. Enter latitude and longitude manually.')); return }
     signal?.addEventListener('abort', abort, { once: true })
     // Browser timeout may exclude time waiting for permission. Keep our own deadline.
-    timer = schedule(() => finish(new Error('The browser did not return a location within 12 seconds. Allow location access, try your regular browser, or search for a town below.')), timeoutMs)
+    timer = schedule(() => finish(new Error('The browser did not return a location within 12 seconds. Allow location access, try your regular browser, or enter coordinates manually.')), timeoutMs)
     try {
       geolocation.getCurrentPosition(position => {
         const { latitude, longitude, accuracy } = position.coords
-        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) { finish(new Error('The browser returned invalid coordinates. Search for a town or enter coordinates.')); return }
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) { finish(new Error('The browser returned invalid coordinates. Enter latitude and longitude manually.')); return }
         finish(null, { latitude: Number(latitude.toFixed(6)), longitude: Number(longitude.toFixed(6)), accuracy: Number.isFinite(accuracy) ? Math.round(accuracy) : null })
       }, error => {
         const messages = {
-          1: 'Location access is blocked. Allow location for this site in your browser, or use town search below.',
-          2: 'Your device could not determine its location. Town search works without device location.',
-          3: 'Device location timed out. Retry, or use town search below.',
+          1: 'Location access is blocked. Allow location for this site in your browser, or enter coordinates manually.',
+          2: 'Your device could not determine its location. Enter coordinates manually.',
+          3: 'Device location timed out. Retry, or enter coordinates manually.',
         }
-        finish(new Error(messages[error.code] || 'Device location failed. Search for a town or enter coordinates.'))
+        finish(new Error(messages[error.code] || 'Device location failed. Enter latitude and longitude manually.'))
       }, { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 300000 })
-    } catch { finish(new Error('This browser could not start location access. Search for a town or enter coordinates.')) }
+    } catch { finish(new Error('This browser could not start location access. Enter latitude and longitude manually.')) }
   })
 }
 

@@ -23,8 +23,6 @@ export const formatNumber = (value, digits = 1) => Number.isFinite(value)
 export function validateFarm(farm) {
   const errors = {}
   if (!farm.name?.trim()) errors.name = 'Give your field a name.'
-  if (!COUNTRIES.includes(farm.country)) errors.country = 'Choose a supported country.'
-  if (!farm.region?.trim()) errors.region = 'Enter your state or province.'
   if (!CROPS.some(c => c.id === farm.crop)) errors.crop = 'Choose a crop.'
   if (!Number.isFinite(Number(farm.area)) || Number(farm.area) <= 0) errors.area = 'Enter an area greater than zero.'
   const lat = Number(farm.latitude), lon = Number(farm.longitude)

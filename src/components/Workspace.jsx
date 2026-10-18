@@ -24,7 +24,7 @@ export default function Workspace({ children, farm, saveFarm }) {
     <div className="workspace">
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="topbar">
-        <Link to="/" className="brand"><Sprout size={22} strokeWidth={1.8} /> HARVEST</Link>
+        <Link to="/" className="brand"><Sprout size={22} strokeWidth={1.8} /> Yield Wise</Link>
         <button className="menu-btn" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuRoute(menuOpen ? null : key)}>
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -49,7 +49,7 @@ export default function Workspace({ children, farm, saveFarm }) {
       <main id="main" className="main">
         {children}
         <footer className="footer">
-          <div className="footer-credit"><strong>HARVEST™</strong><span>© {new Date().getFullYear()} Zohaib Mansoor, Shubhang Nath Thakur, Akshit Mesa.</span></div>
+          <div className="footer-credit"><strong>Yield Wise™</strong><span>© {new Date().getFullYear()} Zohaib Mansoor, Shubhang Nath Thakur, Akshit Mesa.</span></div>
           <div className="footer-details"><Link to="/about">Data & methodology</Link><span>Weather via Open-Meteo · Field profiles saved in this browser</span></div>
         </footer>
       </main>

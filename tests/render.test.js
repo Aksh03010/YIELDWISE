@@ -19,7 +19,7 @@ test('workspace renders supported tools without simulated forecasts or missing-d
       const navigation = html.match(/<nav[^>]*aria-label="Main navigation"[\s\S]*?<\/nav>/)?.[0]
       assert.ok(navigation && !navigation.includes('typing-heading') && !navigation.includes('/market'))
       for (const name of ['Zohaib Mansoor', 'Shubhang Nath Thakur', 'Akshit Mesa']) assert.ok(html.includes(name))
-      assert.ok(html.includes('HARVEST™'))
+      assert.ok(html.includes('Yield Wise™'))
       assert.ok(!html.includes('class="badge'))
       for (const retired of ['vs. sample last season', 'Relative potential', 'Planning horizon', 'Illustrative fixture', 'Interactive what-if simulator']) assert.ok(!html.includes(retired), `${path} exposes a retired fixture`)
       if (path === '/outlook') assert.ok(html.includes('Connecting to the models') && !html.includes('Farm forecast unavailable'))

@@ -62,7 +62,7 @@ changes before committing. Raw prepared datasets and checkpoints are excluded.
   comparisons; measured grain-factor checks against buyer thresholds.
 - Field setup: coordinates, crop, variety, area and management records saved in
   browser storage. Device lookup has its own 12-second deadline and cancellation;
-  town/postcode search is available without device location. Rice may be recorded
+  latitude and longitude can be entered manually. Rice may be recorded
   even though no rice model is installed.
 - Field conditions: seven-day Open-Meteo weather and transparent freezing,
   heat and rainfall threshold checks. These are not crop-damage probabilities.
@@ -106,6 +106,4 @@ Coordinates and planting dates are also sent to NASA POWER when a field estimate
 is requested. They are sent to OpenStreetMap when its link is opened. Research inputs
 are sent to the model service only when the research form is submitted.
 NASA imagery, NDVI and soil/terrain data services are not connected.
-Town/postcode queries are sent directly to Open-Meteo's GeoNames geocoding
-service only when Search is pressed. Town coordinates require confirmation
-or adjustment to the field. The app does not substitute an IP-derived location.
+Device location requires browser permission. Latitude and longitude can also be entered manually.
