@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react'
 import { fetchWeather } from '../services/weatherService.js'
 
 export function useWeather(farm) {
-  const [weather, setWeather] = useState(null)
-  const [status, setStatus] = useState('loading')
+  const [result, setResult] = useState(null)
   const [refresh, setRefresh] = useState(0)
   const { latitude, longitude } = farm
+  const requestKey = `${latitude}:${longitude}:${refresh}`
   useEffect(() => {
     const controller = new AbortController()
     let active = true
     const timeout = setTimeout(() => controller.abort(), 15000)
-    setWeather(null)
-    setStatus('loading')
     fetchWeather({ latitude, longitude }, controller.signal)
-      .then(result => { if (active && !controller.signal.aborted) { setWeather(result); setStatus('ready') } })
-      .catch(() => { if (active) setStatus('error') })
+      .then(weather => { if (active && !controller.signal.aborted) setResult({ requestKey, weather, status: 'ready' }) })
+      .catch(() => { if (active) setResult({ requestKey, weather: null, status: 'error' }) })
       .finally(() => clearTimeout(timeout))
     return () => { active = false; controller.abort(); clearTimeout(timeout) }
-  }, [latitude, longitude, refresh])
-  return { weather, status, refreshWeather: () => setRefresh(value => value + 1) }
+  }, [latitude, longitude, requestKey])
+  // A changed coordinate or refresh immediately hides the previous request's data.
+  const current = result?.requestKey === requestKey ? result : { weather: null, status: 'loading' }
+  return { weather: current.weather, status: current.status, refreshWeather: () => setRefresh(value => value + 1) }
 }

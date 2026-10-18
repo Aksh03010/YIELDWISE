@@ -11,12 +11,22 @@ test('all seven workspace routes render with expected content', async () => {
   globalThis.window = { localStorage: { getItem: () => null } }
   try {
     const { default: App } = await server.ssrLoadModule('/src/App.jsx')
-    const paths = [['/', 'Farm overview'], ['/results', 'Yield outlook'], ['/planning', 'Harvest planning'], ['/predict', 'Field setup'], ['/environmental', 'Field conditions'], ['/market', 'Supply and market scenarios'], ['/about', 'Data sources and methods']]
+    const paths = [
+      ['/', 'Prairie View Farm'],
+      ['/outlook', 'Yield outlook'],
+      ['/planning', 'Harvest planning'],
+      ['/field', 'Field setup'],
+      ['/conditions', 'Field conditions'],
+      ['/market', 'Supply balance lab'],
+      ['/about', 'Data &amp; methodology'],
+    ]
     for (const [path, expected] of paths) {
       const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: [path] }, createElement(App)))
       assert.ok(html.includes(expected), `${path} did not render its content`)
       assert.ok(html.includes('Skip to content'))
       assert.ok(html.includes('HARVEST'))
+      assert.ok(html.includes('href="/planning"'), `${path} is missing harvest planning navigation`)
+      if (path === '/conditions') assert.equal((html.match(/class="day"/g) || []).length, 7, 'Conditions must show seven days even when planning uses 16')
       if (path === '/planning') {
         for (const feature of ['Optimal harvest window', 'Crop quality and marketability', 'Crop risk early warnings', 'Interactive what-if simulator', 'Profit and loss comparison']) assert.ok(html.includes(feature), `Missing planning feature: ${feature}`)
       }
