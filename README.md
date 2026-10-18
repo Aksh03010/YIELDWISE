@@ -1,4 +1,4 @@
-# HARVEST — Field & Crop Intelligence
+# HARVEST: Field planning
 
 A research prototype for farmers and agricultural companies across Canada, the United States and Mexico. HARVEST brings field profiles, weather, harvest outlooks and regional supply scenarios into one workspace.
 
@@ -27,17 +27,18 @@ Production hosting must serve `index.html` for client routes such as `/results`,
 
 - **Overview:** field illustration, harvest metrics, sample yield history, crop comparison and current weather status.
 - **Yield outlook:** 1-, 6- and 12-month planning horizons, with dry, typical and wetter-season scenarios. Values are in metric tonnes/hectare; total production uses the field area. Acres convert using `1 acre = 0.40468564224 hectares`.
+- **Harvest planning:** a connected worksheet for harvest windows, target-grade probability, crop risk signals, what-if scenarios, and two-date profit/loss comparisons. Open `/planning` or choose Harvest planning in the sidebar. Scenario settings and grading records can be saved in local browser storage per field and crop; a labeled CSV plan can be exported.
 - **Field setup:** browser geolocation on user request, manual coordinates, crop and variety, area, irrigation, planting date and soil texture. Three sample farms provide starting points. Field profiles persist in browser local storage.
-- **Field conditions:** current modeled air temperature, humidity and wind, modeled surface soil moisture (0–1 cm), grid elevation, and a seven-day weather forecast from Open-Meteo. Provider failures show clearly marked sample data. Missing live values show a dash.
+- **Field conditions:** current modeled air temperature, humidity and wind, modeled surface soil moisture (0–1 cm), grid elevation, and a seven-day weather forecast from Open-Meteo. Provider failures show clearly marked sample data. Missing live values show N/A.
 - **Supply & markets:** editable opening inventories, production, imports, domestic use, exports, growth assumptions, a reference price and a sensitivity factor. Volumes are hypothetical million metric tonnes, for one marketing year. Region selection labels the scenario; it does not fetch official statistics.
 - **Data & methodology:** available and planned sources, model limitations, units and location handling.
 - **Export:** a CSV field outlook labeled illustrative, with coordinates, area, horizon, yield range, production and generation time.
 
 ## What the numbers mean
 
-Yield is **mass per land area at harvest**. It does not measure protein, grade or other crop quality. Quality remains unassessed until a separate validated model and suitable measurements are connected.
+Yield is **mass per land area at harvest**. It does not measure protein, grade or other crop quality. The harvest planner evaluates custom crop-specific targets and shows illustrative grade probabilities when matching grading records are available; actual crop quality still requires measurements and a validated model. See [harvest-planning calculations and limitations](docs/HARVEST_PLANNING.md).
 
-A horizon is an outlook date, not accumulated crop production over that period. Demo yield is repeatable for a field and scenario. The horizon widens the illustrative spread; it does not run a seasonal weather model. Sample historical points are not official historical observations, and ranges have no statistical confidence interpretation. Real weather does not currently affect demo yield.
+A horizon is an outlook date, not accumulated crop production over that period. Demo yield is repeatable for a field and scenario. The horizon widens the illustrative spread; it does not run a seasonal weather model. Sample historical points are not official historical observations, and ranges have no statistical confidence interpretation. The yield-outlook fixture is independent of weather; the harvest planner uses separate illustrative weather-response calculations.
 
 The supply lab uses:
 
@@ -58,7 +59,7 @@ The example price sensitivity changes the reference price linearly with the chan
 
 Device location uses the [browser Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API), with permission; it does not use IP geolocation. HTTPS or localhost is required. Users must verify that the device coordinates match their field.
 
-The profile stays in local storage on the device. Coordinates are sent to [Open-Meteo](https://open-meteo.com/en/docs) after field selection/save to retrieve weather. Refresh is manual; changing field coordinates triggers another request. Requests time out after 15 seconds and superseded requests are canceled. Weather represents a model grid near the location, rather than an on-field sensor. Review provider usage plans and attribution before a commercial launch. The location link shares coordinates with OpenStreetMap only when opened. Google Fonts supplies typography with system-font fallbacks.
+The profile stays in local storage on the device. Coordinates are sent to [Open-Meteo](https://open-meteo.com/en/docs) after field selection/save to retrieve weather, requesting up to 16 daily forecast dates for harvest planning. The conditions screen and precipitation summary continue to show the first seven days. Refresh is manual; changing field coordinates triggers another request. Requests time out after 15 seconds and superseded requests are canceled. Weather represents a model grid near the location, rather than an on-field sensor. Review provider usage plans and attribution before a commercial launch. The location link shares coordinates with OpenStreetMap only when opened. Google Fonts supplies typography with system-font fallbacks. Imported grading CSV files are parsed locally; no file is uploaded to a server. Records are stored in this browser when the scenario is saved.
 
 [NASA POWER](https://power.larc.nasa.gov/docs/services/api/), vegetation imagery, detailed terrain/soil surveys and official production/trade records remain planned. A NASA API is not needed to find device coordinates. Parcel artwork is illustrative SVG, not satellite imagery or a surveyed boundary.
 

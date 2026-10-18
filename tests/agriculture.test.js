@@ -85,7 +85,7 @@ test('weather adapter preserves nulls and selects soil moisture for current hour
     assert.equal(result.rainfall, 2)
     assert.equal(result.elevation, 570)
     assert.equal(requested.searchParams.get('latitude'), String(FARMS[0].latitude))
-    assert.equal(requested.searchParams.get('forecast_days'), '7')
+    assert.equal(requested.searchParams.get('forecast_days'), '16')
   } finally { globalThis.fetch = originalFetch }
 })
 test('failed or incomplete weather does not masquerade as live data', async () => {
@@ -108,5 +108,19 @@ test('missing rain and unmatched soil moisture are displayed as unavailable', as
     const result = await fetchWeather(FARMS[0])
     assert.equal(result.rainfall, null)
     assert.equal(result.moisture, null)
+  } finally { globalThis.fetch = originalFetch }
+})
+test('extended harvest weather keeps the rainfall summary limited to the first seven days', async () => {
+  const originalFetch = globalThis.fetch
+  const dates = Array.from({ length: 16 }, (_, index) => new Date(Date.UTC(2026, 9, 17 + index)).toISOString().slice(0, 10))
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({
+    current: { time: '2026-10-17T14:15', temperature_2m: 10 },
+    daily: { time: dates, temperature_2m_max: dates.map(() => 15), temperature_2m_min: dates.map(() => 4), precipitation_sum: dates.map((_, index) => index > 6 ? null : 1), weather_code: dates.map(() => 1) },
+  }) })
+  try {
+    const result = await fetchWeather(FARMS[0])
+    assert.equal(result.rainfall, 7)
+    assert.equal(result.days.length, 16)
+    assert.equal(result.days[10].rain, null)
   } finally { globalThis.fetch = originalFetch }
 })

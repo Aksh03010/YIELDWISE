@@ -18,7 +18,7 @@ export const AREA_TO_HA = 0.40468564224
 export const fieldHectares = farm => Number(farm.area) * (farm.areaUnit === 'ac' ? AREA_TO_HA : 1)
 export const formatNumber = (value, digits = 1) => Number.isFinite(value)
   ? new Intl.NumberFormat('en-CA', { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(value)
-  : '—'
+  : 'N/A'
 
 export function validateFarm(farm) {
   const errors = {}

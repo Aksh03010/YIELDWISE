@@ -6,6 +6,7 @@ import FieldEditor from './pages/FieldEditor.jsx'
 import ConditionsPage from './pages/ConditionsPage.jsx'
 import SupplyPage from './pages/SupplyPage.jsx'
 import DataPage from './pages/DataPage.jsx'
+import HarvestPlanner from './pages/HarvestPlanner.jsx'
 import { loadFarm } from './data/agriculture.js'
 import { useWeather } from './hooks/useWeather.js'
 
@@ -29,6 +30,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard {...shared} />} />
         <Route path="/results" element={<Dashboard {...shared} forecastsOnly />} />
+        <Route path="/planning" element={<HarvestPlanner key={`${farm.id}:${farm.crop}`} {...shared} />} />
         <Route path="/predict" element={<FieldEditor key={farm.id} farm={farm} saveFarm={saveFarm} />} />
         <Route path="/environmental" element={<ConditionsPage {...shared} />} />
         <Route path="/market" element={<SupplyPage farm={farm} />} />

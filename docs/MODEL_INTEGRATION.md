@@ -2,6 +2,8 @@
 
 These are proposed integration requirements, not an API currently implemented by HARVEST.
 
+The harvest-planning frontend now implements date-window selection, target-grade scenarios with local CSV evidence, threshold warnings, what-if controls and itemized date-based operating-return comparisons. Its readiness, quality and crop-loss responses remain deterministic examples. See [the harvest-planning calculation notes](HARVEST_PLANNING.md) before replacing these with inference outputs.
+
 ## Yield and quality inference
 
 `src/services/outlookService.js:createOutlook` currently generates deterministic illustrative fixtures. Replace this fixture boundary with an asynchronous server inference adapter and an explicit loading/error state when the trained endpoint is available. Do not relabel fixtures as trained-model results or silently substitute fixtures when live inference fails.
