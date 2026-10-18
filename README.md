@@ -1,159 +1,97 @@
-# YIELD — Your Environment-based Intelligence for Land Decisions
+# HARVEST — Field & Crop Intelligence
 
-> An agricultural intelligence platform that helps farmers and agricultural planners estimate crop production per hectare based on farm location, seed variety, historical weather patterns, soil properties, and environmental conditions.
+A research prototype for farmers and agricultural companies across Canada, the United States and Mexico. HARVEST brings field profiles, weather, harvest outlooks and regional supply scenarios into one workspace.
 
----
+**Status:** The interface and live weather adapter work. Yield, crop comparisons, historical yields, ranges and price sensitivities are illustrative fixtures. No trained yield or quality model, NASA feed, actual commodity quote or trading execution is connected.
 
-## 🌾 Overview
+## Run locally
 
-**YIELD** translates complex, multi-source environmental and agronomic datasets into actionable crop-yield forecasts. Built as a precision-agriculture prototype, the application features an end-to-end user journey from farm profile intake to interactive predictions, climate analysis, and factor attribution.
+Use a current Node.js LTS release compatible with Vite 8 (Node 22.12+ or Node 24).
 
-All predictive and environmental values in this release are **clearly labelled demonstration data**, establishing a robust front-end architecture ready for future integration with live meteorological APIs and trained machine learning inference models.
-
----
-
-## ✨ Features
-
-### 1. Landing Page
-- **Hero Presentation**: Headline *"Know Your Land. Predict Your Yield."* with high-contrast precision-agriculture typography, topographic contours, and live demonstration metric card.
-- **Value Proposition**: 3 core pillars (Location-Based Estimation, Environmental Insights, Better-Informed Planning).
-- **Interactive Explainer**: 3-step workflow (Enter details → Analyze conditions → Explore estimate).
-- **Transparency Disclaimer**: Clear advisory regarding model assumptions and data limitations.
-
-### 2. Multi-Section Crop Prediction Form
-- **Section A: Farm Location**
-  - Country selector (36+ agricultural nations).
-  - Region (state / province) and city / local area inputs.
-  - Interactive coordinate toggles (Latitude & Longitude) with manual entry and map fallback.
-  - One-click **Demo Mode** to test the system with realistic Kenyan Rift Valley maize farming data.
-- **Section B: Crop Information**
-  - Searchable hierarchical categories (Cereals, Legumes, Tubers, Cash crops, Vegetables).
-  - Crop varieties with dynamic filtering and **Custom Variety** entry.
-  - Planting season selection and date picker.
-- **Section C: Field & Growing Conditions**
-  - Field area input with hectare / acre unit conversion.
-  - Irrigation methods (Rainfed, Drip, Sprinkler, Center Pivot, Furrow, etc.).
-  - Farming practices (No-till, Conservation tillage, Organic, IPM, Precision ag).
-  - Soil classification selector (Clay, Sandy, Loam, Silt, Peat, etc.).
-- **Form UX**: Multi-step progress bar with backwards navigation, inline field validation, and accessible focus states.
-
-### 3. Yield Prediction Results Dashboard
-- **Primary Yield Card**:
-  - Estimated yield in tonnes per hectare (**t/ha**).
-  - Total production calculation in tonnes (when field area is provided).
-  - Illustrative uncertainty intervals (e.g. 3.4 – 4.8 t/ha).
-  - Growing season coverage and crop variety summary.
-- **Demonstration Notice**: Explicit callout differentiating demonstration estimates from genuine forecasts.
-
-### 4. Environmental Conditions & Climate Visuals
-- **Telemetry Indicators**: Cards for temperature averages, precipitation totals, soil profile (pH, texture, organic matter, drainage), soil moisture, elevation, and terrain.
-- **Interactive Recharts Charts**:
-  - Growing-season temperature dynamics (smooth AreaChart with gradient shading).
-  - Monthly precipitation distribution (BarChart in forest green theme).
-- **Farm Map Panel**: Geospatial coordinate grid visualization with provider placeholder notice.
-
-### 5. Model Insights ("What Influences Your Yield?")
-- **Factor Attribution**: Relative weighting bars for Temperature, Rainfall, Soil Properties, Seed Genetics, Historical Benchmarks, and Topography.
-- **Prediction Pipeline**: 5-step transparent architectural explanation from ingestion to uncertainty estimation.
-
-### 6. Historical & Scenario Comparison
-- **ComposedChart Benchmark**: Multi-year regional historical yields contrasted with the current estimate via dashed reference threshold lines.
-
-### 7. Farm Financial Outlook (Preview)
-- Preview of future financial capabilities including Expected Revenue, Operating Costs, Estimated Profit/Loss, and Sensitivity Analysis — marked as **Coming Soon**.
-
-### 8. About the Technology Page
-- Deep dive into YIELD's mission, data pipeline mechanics, data source specifications (Weather & Climate, Soil Surveys, Remote Sensing / Satellite, Official Yield Records), and prototype status.
-
----
-
-## 🎨 Design & Styling Architecture
-
-- **Palette**: Deep forest green (`#1B4332`), forest light (`#2D6A4F`), muted sage (`#95A88C`), warm cream (`#FAFAF5`), earth tones (`#8B7355`), and crisp borders.
-- **Single Stylesheet Architecture**: All styles reside in [`src/app.css`](file:///c:/Users/akshi/Documents/HARVEST/src/app.css) using Tailwind CSS v4 `@apply` rules and custom component classes. **JSX files remain clean and uncluttered by lengthy inline utility classes.**
-- **Typography**: Playfair Display for editorial headers paired with Inter for clean, legible numeric dashboards.
-- **Icons**: Lucide React.
-- **Charts**: Recharts with custom responsive containers and theme-aligned palettes.
-
----
-
-## 🛠️ Project Structure
-
-```
-HARVEST/
-├── public/
-│   ├── favicon.svg             # Leaf/sprout SVG brand icon
-│   └── icons.svg
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── ClimateCharts.jsx   # Temperature & Rainfall Area/Bar charts
-│   │   ├── EnvironmentalCards.jsx # 6 Environmental telemetry cards
-│   │   ├── ErrorState.jsx      # Reusable error boundaries
-│   │   ├── FinancialPreview.jsx# Future financial outlook cards
-│   │   ├── Footer.jsx          # Global brand footer
-│   │   ├── HistoricalComparison.jsx # Benchmark comparison chart
-│   │   ├── LoadingState.jsx    # 5-step animated model inference simulation
-│   │   ├── MapPanel.jsx        # Geospatial map placeholder panel
-│   │   ├── ModelInsights.jsx   # Factor attribution & pipeline overview
-│   │   ├── Navbar.jsx          # Global navigation with active states & mobile menu
-│   │   └── YieldResultCard.jsx # Hero yield metrics card
-│   ├── data/
-│   │   └── types.js            # Reference taxonomies (crops, soils, countries, etc.)
-│   ├── pages/
-│   │   ├── AboutPage.jsx       # Technology & data sources explainer
-│   │   ├── EnvironmentalData.jsx # Dedicated environmental dashboard
-│   │   ├── LandingPage.jsx     # Marketing & value proposition page
-│   │   ├── PredictionForm.jsx  # Multi-step prediction intake form
-│   │   └── ResultsDashboard.jsx# Full results report page
-│   ├── services/
-│   │   └── predictionService.js# Decoupled mock prediction engine
-│   ├── app.css                 # Master centralized stylesheet with Tailwind
-│   ├── App.jsx                 # Router config & scroll-to-top handler
-│   └── main.jsx                # React root mount
-├── package.json
-├── vite.config.js
-└── index.html
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v18+ recommended)
-- npm
-
-### Installation
-```bash
-# Clone or navigate to the repository
-cd HARVEST
-
-# Install dependencies
-npm install
-```
-
-### Development Server
-```bash
+```sh
+npm ci
 npm run dev
 ```
-Open `http://localhost:5173` in your browser.
 
-### Production Build
-```bash
-npm run build
+Open the local address printed by Vite (normally `http://localhost:5173`).
+
+```sh
+npm test       # calculations, validation, weather adapter and route rendering
+npm run build # production assets in dist/
+npm run preview
 ```
 
-### Code Quality & Linting
-```bash
-npm run lint
+Production hosting must serve `index.html` for client routes such as `/results`, `/predict` and `/market`.
+
+## The workspace
+
+- **Overview:** field illustration, harvest metrics, sample yield history, crop comparison and current weather status.
+- **Yield outlook:** 1-, 6- and 12-month planning horizons, with dry, typical and wetter-season scenarios. Values are in metric tonnes/hectare; total production uses the field area. Acres convert using `1 acre = 0.40468564224 hectares`.
+- **Field setup:** browser geolocation on user request, manual coordinates, crop and variety, area, irrigation, planting date and soil texture. Three sample farms provide starting points. Field profiles persist in browser local storage.
+- **Field conditions:** current modeled air temperature, humidity and wind, modeled surface soil moisture (0–1 cm), grid elevation, and a seven-day weather forecast from Open-Meteo. Provider failures show clearly marked sample data. Missing live values show a dash.
+- **Supply & markets:** editable opening inventories, production, imports, domestic use, exports, growth assumptions, a reference price and a sensitivity factor. Volumes are hypothetical million metric tonnes, for one marketing year. Region selection labels the scenario; it does not fetch official statistics.
+- **Data & methodology:** available and planned sources, model limitations, units and location handling.
+- **Export:** a CSV field outlook labeled illustrative, with coordinates, area, horizon, yield range, production and generation time.
+
+## What the numbers mean
+
+Yield is **mass per land area at harvest**. It does not measure protein, grade or other crop quality. Quality remains unassessed until a separate validated model and suitable measurements are connected.
+
+A horizon is an outlook date, not accumulated crop production over that period. Demo yield is repeatable for a field and scenario. The horizon widens the illustrative spread; it does not run a seasonal weather model. Sample historical points are not official historical observations, and ranges have no statistical confidence interpretation. Real weather does not currently affect demo yield.
+
+The supply lab uses:
+
+```text
+scenario production = baseline production × (1 + production change / 100)
+scenario domestic use = baseline domestic use × (1 + population/use growth / 100)
+available supply = opening stocks + scenario production + external imports
+total use = scenario domestic use + external exports
+ending stocks = available supply − total use
+stocks-to-use = ending stocks / total use
 ```
-The codebase strictly adheres to ESLint rules and React 19 standards (0 errors, 0 warnings).
 
----
+Keep imports and exports external to the chosen region to avoid counting internal trade twice. A negative ending inventory means unmet demand. Population growth is only a simplified demand proxy; real food, feed, industrial, seed and loss components require separate estimation.
 
-## 🔒 Data Provenance & Ethics Note
+The example price sensitivity changes the reference price linearly with the change in stocks-to-use, using a user-specified coefficient. It is not an econometric forecast or a long/short signal. The price display is withheld for negative stocks. A single farm is never automatically scaled to continental production.
 
-YIELD is explicitly designed to maintain trust and data transparency:
-- Demonstration numbers are never misrepresented as satellite telemetry or active ML inference.
-- Uncertainty intervals are displayed to remind users that agricultural yields depend on variable in-season weather, pest pressures, and field management.
+## Sources and privacy
+
+Device location uses the [browser Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API), with permission; it does not use IP geolocation. HTTPS or localhost is required. Users must verify that the device coordinates match their field.
+
+The profile stays in local storage on the device. Coordinates are sent to [Open-Meteo](https://open-meteo.com/en/docs) after field selection/save to retrieve weather. Refresh is manual; changing field coordinates triggers another request. Requests time out after 15 seconds and superseded requests are canceled. Weather represents a model grid near the location, rather than an on-field sensor. Review provider usage plans and attribution before a commercial launch. The location link shares coordinates with OpenStreetMap only when opened. Google Fonts supplies typography with system-font fallbacks.
+
+[NASA POWER](https://power.larc.nasa.gov/docs/services/api/), vegetation imagery, detailed terrain/soil surveys and official production/trade records remain planned. A NASA API is not needed to find device coordinates. Parcel artwork is illustrative SVG, not satellite imagery or a surveyed boundary.
+
+## Connecting the research model
+
+See [the integration notes](docs/MODEL_INTEGRATION.md). The current application is frontend-only: there is no deployed inference backend, user account service, scheduled data pipeline or model training system.
+
+Keep trained-model credentials and provider secrets on a server. Validate inference outputs and attach model version, units, observation dates and interval definitions before presenting them as forecasts. Evaluate spatial and time-based holdouts, crop-specific performance and horizon-specific calibration before operational use.
+
+## Source layout
+
+```text
+src/
+  App.jsx                      Routes, field state and saved profile
+  app.css                      Responsive workspace styles
+  components/
+    Workspace.jsx              Navigation and active field selector
+    FieldIllustration.jsx      Labeled parcel artwork
+    ForecastChart.jsx          Lazy-loaded yield chart
+  data/agriculture.js          Crops, samples, units and validation
+  hooks/useWeather.js          Fetch lifecycle, timeout and cancellation
+  pages/
+    Dashboard.jsx              Overview and yield outlook
+    FieldEditor.jsx            Field setup and device geolocation
+    ConditionsPage.jsx         Weather and measurement availability
+    SupplyPage.jsx             Regional balance and sensitivity lab
+    DataPage.jsx               Sources and methodology
+  services/
+    outlookService.js          Demo yields and supply equations
+    weatherService.js          Open-Meteo adapter
+tests/
+  agriculture.test.js          Calculation and service checks
+  render.test.js               Six-route rendering smoke test
+```
+
+Built with React, Vite, React Router, Recharts and Lucide icons. The unused prototype pages and randomized prediction service were replaced by the workspace above.
